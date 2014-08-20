@@ -1,0 +1,322 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.forbesdigital.jee</groupId>
+  <artifactId>validation</artifactId>
+  <name>FD JEE Validation</name>
+  <version>0.1.0-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-clean-plugin</artifactId>
+					<version>2.5</version>
+				</plugin>
+				
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-resources-plugin</artifactId>
+					<version>2.6</version>
+					<configuration>
+						<encoding>${project.build.sourceEncoding}</encoding>
+					</configuration>
+				</plugin>
+				
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.1</version>
+					<configuration>
+						<encoding>${project.build.sourceEncoding}</encoding>
+						<source>1.7</source>
+						<target>1.7</target>
+					</configuration>
+				</plugin>
+				
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>2.16</version>
+					<configuration>
+						<skip>true</skip>
+					</configuration>
+				</plugin>
+				
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-deploy-plugin</artifactId>
+					<version>2.8.1</version>
+				</plugin>
+
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>versions-maven-plugin</artifactId>
+					<version>2.0</version>
+				</plugin>				
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-source-plugin</artifactId>
+					<version>2.2.1</version>
+					<executions>
+						<execution>
+							<id>attach-sources</id>
+							<goals>
+								<goal>jar</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-javadoc-plugin</artifactId>
+					<version>2.9.1</version>
+					<configuration>
+						<encoding>UTF-8</encoding>
+					</configuration>
+					<executions>
+						<execution>
+							<id>attach-javadocs</id>
+							<goals>
+								<goal>jar</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+
+				<plugin>
+					<groupId>com.lotaris.maven.rox.plugins</groupId>
+					<artifactId>rox-junit-maven-plugin</artifactId>
+					<version>2.0.2</version>
+					<configuration>
+						<miniRoxListenerClass>com.lotaris.minirox.client.junit.MiniRoxListener</miniRoxListenerClass>
+						<miniRoxFilterClass>com.lotaris.minirox.client.MiniRoxFilter</miniRoxFilterClass>
+						<roxConfig>${project.basedir}/target/classes/rox.yml</roxConfig>
+					</configuration>
+					<dependencies>
+						<dependency>
+							<groupId>com.lotaris.minirox.client</groupId>
+							<artifactId>minirox-client-junit</artifactId>
+							<version>2.0.0</version>
+						</dependency>
+					</dependencies>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+		
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-clean-plugin</artifactId>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+			</plugin>
+
+			<plugin>
+				<groupId>com.lotaris.maven.rox.plugins</groupId>
+				<artifactId>rox-junit-maven-plugin</artifactId>
+				<configuration>
+					<fullStackTraces>true</fullStackTraces>
+<!--			<filters>
+						<filter>55b73b7b80bc</filter>
+					</filters> -->
+				</configuration>
+			</plugin>
+		</plugins>
+
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<includes>
+					<include>rox.yml</include>
+				</includes>
+			</resource>
+
+			<resource>
+				<directory>src/main/resources/META-INF</directory>
+				<targetPath>META-INF</targetPath>
+				<includes>
+					<include>beans.xml</include>
+				</includes>
+			</resource>
+		</resources>
+		
+		<testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>junitee.properties</include>
+				</includes>
+			</testResource>
+		</testResources>
+	</build>
+
+	<profiles>
+		<profile>
+			<id>lotarisVersion</id>
+
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>versions-maven-plugin</artifactId>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>		
+	</profiles>
+
+	<distributionManagement>
+		<repository>
+			<id>LotarisReleases</id>
+			<name>Lotaris Release Repository</name>
+			<url>${settings.lotaris.nexus.lotaris.releases.url}</url>
+		</repository>
+		<snapshotRepository>
+			<id>LotarisSnapshots</id>
+			<name>Lotaris Snapshot Repository</name>
+			<url>${settings.lotaris.nexus.lotaris.snapshots.url}</url>
+		</snapshotRepository>
+	</distributionManagement>
+
+	<repositories>
+		<repository>
+			<id>LotarisReleases</id>
+			<name>Lotaris Releases Repository</name>
+			<url>${settings.lotaris.nexus.releases.url}</url>
+			<releases/>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>LotarisSnapshots</id>
+			<name>Lotaris Snapshots Repository</name>
+			<url>${settings.lotaris.nexus.snapshots.url}</url>
+			<releases/>
+			<snapshots>
+				<updatePolicy>never</updatePolicy>
+			</snapshots>
+		</repository>
+	</repositories>
+
+	<pluginRepositories>
+		<pluginRepository>
+			<id>LotarisReleases</id>
+			<name>Lotaris Repository</name>
+			<url>${settings.lotaris.nexus.releases.url}</url>
+			<releases/>
+		</pluginRepository>
+		<pluginRepository>
+			<id>LotarisSnapshots</id>
+			<name>Lotaris Repository</name>
+			<url>${settings.lotaris.nexus.snapshots.url}</url>
+			<snapshots/>
+		</pluginRepository>
+	</pluginRepositories>
+	
+  <dependencies>
+		<dependency>
+			<groupId>com.lotaris.rox.client</groupId>
+			<artifactId>rox-client-junit</artifactId>
+			<version>2.0.0</version>
+			<scope>test</scope>
+		</dependency>
+		
+<!--		<dependency>
+			<groupId>org.eclipse.persistence</groupId>
+			<artifactId>javax.persistence</artifactId>
+			<version>2.1.0</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.persistence</groupId>
+			<artifactId>eclipselink</artifactId>
+			<version>2.5.2-M1</version>
+			<scope>test</scope>
+		</dependency>-->
+		
+		<dependency>
+			<groupId>javax</groupId>
+			<artifactId>javaee-api</artifactId>
+			<version>7.0</version>
+			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.glassfish.jersey.media</groupId>
+			<artifactId>jersey-media-json-jackson</artifactId>
+			<version>2.0</version>
+			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.5</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.7.5</version>
+			<scope>test</scope>
+		</dependency>
+		
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.11</version>
+			<scope>provided</scope>
+    </dependency>
+		
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<version>1.9.5</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.powermock</groupId>
+			<artifactId>powermock-module-junit4</artifactId>
+			<version>1.5.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.powermock</groupId>
+			<artifactId>powermock-api-mockito</artifactId>
+			<version>1.5.1</version>
+			<scope>test</scope>
+		</dependency>		
+
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<scope>test</scope>
+			<version>4.3.1.Final</version>
+		</dependency>		
+  </dependencies>
+</project>

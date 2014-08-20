@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+	<action>
+		<actionName>CUSTOM-Compile</actionName>
+		<displayName>Compile</displayName>
+		<goals>
+			<goal>clean</goal>
+			<goal>install</goal>
+			<goal>rox-junit:junit</goal>
+			<goal>-e</goal>
+			<goal>-PlotarisBuildSource</goal>
+		</goals>
+	</action>
+  <action>
+    <actionName>CUSTOM-deploy</actionName>
+    <displayName>Deploy</displayName>
+    <goals>
+      <goal>clean</goal>
+      <goal>install</goal>
+			<goal>deploy</goal>
+      <goal>-e</goal>
+      <goal>-PlotarisBuildSource</goal>
+    </goals>
+  </action>
+	<action>
+		<actionName>CUSTOM-set-version</actionName>
+		<displayName>Change Version</displayName>
+		<goals>
+			<goal>versions:set</goal>
+			<goal>versions:commit</goal>
+			<goal>-PlotarisBuildSource</goal>
+			<goal>-PlotarisVersion</goal>
+		</goals>
+	</action>
+</actions>
