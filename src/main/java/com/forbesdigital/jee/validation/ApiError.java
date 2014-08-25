@@ -18,11 +18,11 @@ import org.codehaus.jackson.annotate.JsonProperty;
 public class ApiError implements IError {
 
 	private String message;
-	private String location;
 	@JsonIgnore
 	private IErrorCode code;
 	@JsonIgnore
 	private IErrorLocationType locationType;
+	private String location;
 
 	//<editor-fold defaultstate="collapsed" desc="Constructors">
 	public ApiError(String message, IErrorCode code) {
@@ -30,24 +30,24 @@ public class ApiError implements IError {
 		this.code = code;
 	}
 
-	public ApiError(String message, String location, IErrorLocationType locationType, IErrorCode code) {
+	public ApiError(String message, IErrorCode code, IErrorLocationType locationType, String location) {
 		this.message = message;
-		this.location = location;
-		this.locationType = locationType;
 		this.code = code;
+		this.locationType = locationType;
+		this.location = location;
 	}
 	//</editor-fold>
-
-	@JsonProperty("code")
-	public Integer getNumericCode() {
-		return code != null ? code.getCode() : null;
-	}
 
 	@JsonProperty("locationType")
 	public String getStringType() {
 		return locationType != null ? locationType.getLocationType(): null;
 	}
 	
+	@JsonProperty("code")
+	public Integer getNumericCode() {
+		return code != null ? code.getCode() : null;
+	}
+
 	//<editor-fold defaultstate="collapsed" desc="Getters & Setters">
 	@Override
 	public String getMessage() {
@@ -68,21 +68,21 @@ public class ApiError implements IError {
 	}
 
 	@Override
-	public String getLocation() {
-		return location;
-	}
-
-	public void setLocation(String location) {
-		this.location = location;
-	}
-
-	@Override
 	public IErrorLocationType getLocationType() {
 		return locationType;
 	}
 
 	public void setLocationType(IErrorLocationType locationType) {
 		this.locationType = locationType;
+	}
+
+	@Override
+	public String getLocation() {
+		return location;
+	}
+
+	public void setLocation(String location) {
+		this.location = location;
 	}
 	//</editor-fold>
 }

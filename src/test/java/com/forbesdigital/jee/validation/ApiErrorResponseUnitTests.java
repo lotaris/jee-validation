@@ -69,10 +69,11 @@ public class ApiErrorResponseUnitTests {
 	public void apiErrorResponseShouldCheckWhetherItHasErrorsByLocation() {
 
 		final ApiErrorResponse res = badRequest();
-		res.addError(new ApiError("1", code(1))).addError(new ApiError("2", "/bar", locationType("locationType"), code(2)));
+		res.addError(new ApiError("1", code(1)))
+				.addError(new ApiError("2", code(2), locationType("locationType"), "/bar"));
 		assertFalse(res.hasErrors("/foo"));
 
-		res.addError(new ApiError("3", "/foo", locationType("locationType"), code(3)));
+		res.addError(new ApiError("3", code(3), locationType("locationType"), "/foo"));
 		assertTrue(res.hasErrors("/foo"));
 	}
 
@@ -81,7 +82,7 @@ public class ApiErrorResponseUnitTests {
 	public void apiErrorResponseShouldCheckWhetherItHasErrorsWithNoLocation() {
 
 		final ApiErrorResponse res = badRequest();
-		res.addError(new ApiError("1", "/1", locationType("locationType"), code(1)));
+		res.addError(new ApiError("1", code(1), locationType("locationType"), "/1"));
 		assertFalse(res.hasErrors((String) null));
 
 		res.addError(new ApiError("2", code(2)));
@@ -93,7 +94,8 @@ public class ApiErrorResponseUnitTests {
 	public void apiErrorResponseShouldCheckWhetherItHasErrorsByLocationIncludingSubLocations() {
 
 		final ApiErrorResponse res = badRequest();
-		res.addError(new ApiError("foo", "/person/name", locationType("locationType"), code(1))).addError(new ApiError("bar", "/person/children/0/name", locationType("locationType"), code(2)));
+		res.addError(new ApiError("foo", code(1), locationType("locationType"), "/person/name"))
+				.addError(new ApiError("bar", code(2), locationType("locationType"), "/person/children/0/name"));
 
 		assertTrue(res.hasErrors("/person"));
 		assertTrue(res.hasErrors("/person/name"));
@@ -107,7 +109,8 @@ public class ApiErrorResponseUnitTests {
 	public void apiErrorResponseShouldNotIncludePartialMatchesWhenCheckingWhetherItHasErrorsByLocation() {
 
 		final ApiErrorResponse res = badRequest();
-		res.addError(new ApiError("foo", "/person/name", locationType("locationType"), code(1))).addError(new ApiError("bar", "/person/children/0/name", locationType("locationType"), code(2)));
+		res.addError(new ApiError("foo", code(1), locationType("locationType"), "/person/name"))
+				.addError(new ApiError("bar", code(2), locationType("locationType"), "/person/children/0/name"));
 
 		assertFalse(res.hasErrors("/pers"));
 		assertFalse(res.hasErrors("/person/child"));
@@ -120,7 +123,9 @@ public class ApiErrorResponseUnitTests {
 	public void apiErrorResponseShouldCheckWhetherItHasErrorsByCode() {
 
 		final ApiErrorResponse res = badRequest();
-		res.addError(new ApiError("1", null)).addError(new ApiError("2", code(2))).addError(new ApiError("3", "/3", locationType("locationType"), code(3)));
+		res.addError(new ApiError("1", null))
+				.addError(new ApiError("2", code(2)))
+				.addError(new ApiError("3", code(3), locationType("locationType"), "/3"));
 		assertFalse(res.hasErrors(code(4)));
 
 		res.addError(new ApiError("4", code(4)));

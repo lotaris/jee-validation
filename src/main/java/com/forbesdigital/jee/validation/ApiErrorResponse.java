@@ -64,22 +64,22 @@ public class ApiErrorResponse implements IErrorCollector {
 	 * or 5xx range
 	 */
 	public ApiErrorResponse(String message, IErrorCode errorCode) {
-		this(message, null, null, errorCode);
+		this(message, errorCode, null, null);
 	}
 	
 	/**
 	 * Constructs a new error response with one error message.
 	 *
 	 * @param message the detail message
-	 * @param location the location of the error
-	 * @param locationType the location type
 	 * @param errorCode the code identifying the error (must have a default HTTP status code)
+	 * @param locationType the location type
+	 * @param location the location of the error
 	 * @throws IllegalArgumentException if the code's default status code is null or not in the 4xx
 	 * or 5xx range
 	 */
-	public ApiErrorResponse(String message, String location, IErrorLocationType locationType, IErrorCode errorCode) {
+	public ApiErrorResponse(String message, IErrorCode errorCode, IErrorLocationType locationType, String location) {
 		this(errorCode.getDefaultHttpStatusCode());
-		addError(new ApiError(message, location, locationType, errorCode));
+		addError(new ApiError(message, errorCode, locationType, location));
 	}
 
 	private void addError(ApiError error) {
@@ -110,7 +110,7 @@ public class ApiErrorResponse implements IErrorCollector {
 
 	@Override
 	public IErrorCollector addError(IError error) {
-		addError(error instanceof ApiError ? ((ApiError) error) : new ApiError(error.getMessage(), error.getLocation(), error.getLocationType(), error.getCode()));
+		addError(error instanceof ApiError ? ((ApiError) error) : new ApiError(error.getMessage(), error.getCode(), error.getLocationType(), error.getLocation()));
 		return this;
 	}
 
