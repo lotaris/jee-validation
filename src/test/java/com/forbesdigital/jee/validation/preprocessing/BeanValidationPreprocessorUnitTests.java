@@ -1,7 +1,7 @@
 package com.forbesdigital.jee.validation.preprocessing;
 
 import com.forbesdigital.jee.validation.AbstractConstraintValidator;
-import com.forbesdigital.jee.validation.IConstraintCode;
+import com.forbesdigital.jee.validation.IConstraintConverter;
 import com.forbesdigital.jee.validation.IConstraintValidationContext;
 import com.forbesdigital.jee.validation.IErrorCode;
 import com.forbesdigital.jee.validation.IErrorLocationType;
@@ -59,21 +59,38 @@ public class BeanValidationPreprocessorUnitTests {
 		when(config.getValidators()).thenReturn(Collections.EMPTY_LIST);
 		when(config.isPatchValidationEnabled()).thenReturn(false);
 
-		processor.setConstraintCode(new IConstraintCode() {
+		processor.setConstraintConverter(new IConstraintConverter() {
 			@Override
 			public IErrorCode getErrorCode(Class<? extends Annotation> annotationType) {
-				final ConstraintCode code = annotationType.getAnnotation(ConstraintCode.class);
+				final ConstraintConverter converter = annotationType.getAnnotation(ConstraintConverter.class);
 				
-				if (code != null) {
+				if (converter != null) {
 					return new IErrorCode() {
 						@Override
 						public int getCode() {
-							return code.value();
+							return converter.code();
 						}
 
 						@Override
 						public int getDefaultHttpStatusCode() {
 							return 200;
+						}
+					};
+				}
+				else {
+					return null;
+				}
+			}
+
+			@Override
+			public IErrorLocationType getErrorLocationType(Class<? extends Annotation> annotationType) {
+				final ConstraintConverter converter = annotationType.getAnnotation(ConstraintConverter.class);
+				
+				if (converter != null) {
+					return new IErrorLocationType() {
+						@Override
+						public String getLocationType() {
+							return converter.locationType();
 						}
 					};
 				}
@@ -120,19 +137,24 @@ public class BeanValidationPreprocessorUnitTests {
 
 		final NotNullErrorCode notNullErrorCode = new NotNullErrorCode();
 		final LengthErrorCode lnErrorCode = new LengthErrorCode();
-		IErrorLocationType errorLocationType = null; 
+		final JsonLocationType errorLocationType = new JsonLocationType(); 
 
-		processor.setConstraintCode(new IConstraintCode() {
+		processor.setConstraintConverter(new IConstraintConverter() {
 			@Override
 			public IErrorCode getErrorCode(Class<? extends Annotation> annotationType) {
-				final ConstraintCode code = annotationType.getAnnotation(ConstraintCode.class);
+				final ConstraintConverter converter = annotationType.getAnnotation(ConstraintConverter.class);
 
-				if (code.value() == 10) {
+				if (converter.code() == 10) {
 					return notNullErrorCode;
 				}
 				else {
 					return lnErrorCode;
 				}
+			}
+
+			@Override
+			public IErrorLocationType getErrorLocationType(Class<? extends Annotation> annotationType) {
+				return errorLocationType;
 			}
 		});
 		
@@ -161,12 +183,17 @@ public class BeanValidationPreprocessorUnitTests {
 		patch.setAddress(new AddressTO()); // address is set with no street; street should be invalid
 
 		final NotNullErrorCode notNullErrorCode = new NotNullErrorCode();
-		IErrorLocationType errorLocationType = null; 
+		final JsonLocationType errorLocationType = new JsonLocationType(); 
 
-		processor.setConstraintCode(new IConstraintCode() {
+		processor.setConstraintConverter(new IConstraintConverter() {
 			@Override
 			public IErrorCode getErrorCode(Class<? extends Annotation> annotationType) {
 				return notNullErrorCode;
+			}
+
+			@Override
+			public IErrorLocationType getErrorLocationType(Class<? extends Annotation> annotationType) {
+				return errorLocationType;
 			}
 		});
 
@@ -192,12 +219,17 @@ public class BeanValidationPreprocessorUnitTests {
 		// last name not set; should be validated because patch validation is not enabled
 
 		final NotNullErrorCode notNullErrorCode = new NotNullErrorCode();
-		IErrorLocationType errorLocationType = null; 
+		final JsonLocationType errorLocationType = new JsonLocationType(); 
 		
-		processor.setConstraintCode(new IConstraintCode() {
+		processor.setConstraintConverter(new IConstraintConverter() {
 			@Override
 			public IErrorCode getErrorCode(Class<? extends Annotation> annotationType) {
 				return notNullErrorCode;
+			}
+
+			@Override
+			public IErrorLocationType getErrorLocationType(Class<? extends Annotation> annotationType) {
+				return errorLocationType;
 			}
 		});
 		
@@ -231,7 +263,7 @@ public class BeanValidationPreprocessorUnitTests {
 	@Target(ElementType.FIELD)
 	@Retention(RetentionPolicy.RUNTIME)
 	@Constraint(validatedBy = CheckNotNullTestValidator.class)
-	@ConstraintCode(10)
+	@ConstraintConverter(code = 10, locationType = "JSON")
 	public @interface CheckNotNullTest {
 
 		String message() default "This value must not be null.";
@@ -257,7 +289,7 @@ public class BeanValidationPreprocessorUnitTests {
 	@Target(ElementType.FIELD)
 	@Retention(RetentionPolicy.RUNTIME)
 	@Constraint(validatedBy = CheckStringLengthTestValidator.class)
-	@ConstraintCode(12)
+	@ConstraintConverter(code = 12, locationType = "json")
 	public @interface CheckStringLengthTest {
 
 		int max();
@@ -441,5 +473,15 @@ public class BeanValidationPreprocessorUnitTests {
 		public int getDefaultHttpStatusCode() {
 			return 422;
 		}
-	}	//</editor-fold>
+	}
+	
+	public static class JsonLocationType implements IErrorLocationType {
+	
+		@Override
+		public String getLocationType() {
+			return "json"; //To change body of generated methods, choose Tools | Templates.
+		}
+	}
+	//</editor-fold>
+
 }

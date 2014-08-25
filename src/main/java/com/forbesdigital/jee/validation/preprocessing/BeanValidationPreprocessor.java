@@ -2,7 +2,7 @@ package com.forbesdigital.jee.validation.preprocessing;
 
 import com.forbesdigital.jee.validation.AbstractPatchTransferObject;
 import com.forbesdigital.jee.validation.ApiErrorResponseTO;
-import com.forbesdigital.jee.validation.IConstraintCode;
+import com.forbesdigital.jee.validation.IConstraintConverter;
 import com.forbesdigital.jee.validation.IErrorCode;
 import com.forbesdigital.jee.validation.IErrorLocationType;
 import com.forbesdigital.jee.validation.IJsonWrapper;
@@ -59,12 +59,12 @@ public class BeanValidationPreprocessor implements IPreprocessor {
 	@Inject
 	private ValidatorFactory validatorFactory;
 
-	private IConstraintCode constraintCode;
+	private IConstraintConverter constraintConverter;
 	
 	@Override
 	public boolean process(Object object, IPreprocessingConfig config) {
 		// TODO: Add proper error message for null constraint code
-		if (constraintCode == null) {
+		if (constraintConverter == null) {
 			throw new IllegalStateException("No constraint code is configured.");
 		}
 		
@@ -138,8 +138,8 @@ public class BeanValidationPreprocessor implements IPreprocessor {
 	}
 
 	// TODO: Comment
-	public void setConstraintCode(IConstraintCode constraintCode) {
-		this.constraintCode = constraintCode;
+	public void setConstraintConverter(IConstraintConverter constraintConverter) {
+		this.constraintConverter = constraintConverter;
 	}
 	
 	/**
@@ -154,10 +154,8 @@ public class BeanValidationPreprocessor implements IPreprocessor {
 
 		// extract the error code, if any
 		final Class<? extends Annotation> annotationType = violation.getConstraintDescriptor().getAnnotation().annotationType();
-		final IErrorCode validationCode = constraintCode.getErrorCode(annotationType);
-		
-		// FIXME - get the error type from Constraint annotation
-		final IErrorLocationType validationType = null;
+		final IErrorCode validationCode = constraintConverter.getErrorCode(annotationType);
+		final IErrorLocationType validationType = constraintConverter.getErrorLocationType(annotationType);
 
 		// add the error to the validation context
 		context.addError(pointer.toString(), validationType, validationCode, violation.getMessage());
