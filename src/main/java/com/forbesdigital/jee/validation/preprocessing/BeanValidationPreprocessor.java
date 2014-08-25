@@ -4,6 +4,7 @@ import com.forbesdigital.jee.validation.AbstractPatchTransferObject;
 import com.forbesdigital.jee.validation.ApiErrorResponseTO;
 import com.forbesdigital.jee.validation.IConstraintCode;
 import com.forbesdigital.jee.validation.IErrorCode;
+import com.forbesdigital.jee.validation.IErrorLocationType;
 import com.forbesdigital.jee.validation.IJsonWrapper;
 import com.forbesdigital.jee.validation.IPatchObject;
 import com.forbesdigital.jee.validation.IValidationContext;
@@ -58,12 +59,12 @@ public class BeanValidationPreprocessor implements IPreprocessor {
 	@Inject
 	private ValidatorFactory validatorFactory;
 
-	private IConstraintCode contraintCode;
+	private IConstraintCode constraintCode;
 	
 	@Override
 	public boolean process(Object object, IPreprocessingConfig config) {
 		// TODO: Add proper error message for null constraint code
-		if (contraintCode == null) {
+		if (constraintCode == null) {
 			throw new IllegalStateException("No constraint code is configured.");
 		}
 		
@@ -138,7 +139,7 @@ public class BeanValidationPreprocessor implements IPreprocessor {
 
 	// TODO: Comment
 	public void setConstraintCode(IConstraintCode constraintCode) {
-		this.contraintCode = constraintCode;
+		this.constraintCode = constraintCode;
 	}
 	
 	/**
@@ -153,9 +154,12 @@ public class BeanValidationPreprocessor implements IPreprocessor {
 
 		// extract the error code, if any
 		final Class<? extends Annotation> annotationType = violation.getConstraintDescriptor().getAnnotation().annotationType();
-		final IErrorCode validationCode = contraintCode.getErrorCode(annotationType);
+		final IErrorCode validationCode = constraintCode.getErrorCode(annotationType);
+		
+		// FIXME - get the error type from Constraint annotation
+		final IErrorLocationType validationType = null;
 
 		// add the error to the validation context
-		context.addError(pointer.toString(), validationCode != null ? validationCode : null, violation.getMessage());
+		context.addError(pointer.toString(), validationType, validationCode, violation.getMessage());
 	}
 }

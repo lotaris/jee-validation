@@ -4,6 +4,7 @@ import com.forbesdigital.jee.validation.AbstractConstraintValidator;
 import com.forbesdigital.jee.validation.IConstraintCode;
 import com.forbesdigital.jee.validation.IConstraintValidationContext;
 import com.forbesdigital.jee.validation.IErrorCode;
+import com.forbesdigital.jee.validation.IErrorLocationType;
 import com.forbesdigital.jee.validation.IPatchObject;
 import com.forbesdigital.jee.validation.IValidationContext;
 import com.lotaris.rox.annotations.RoxableTest;
@@ -94,8 +95,8 @@ public class BeanValidationPreprocessorUnitTests {
 		assertTrue(processor.process(user, config));
 
 		// ensure that no other errors have been added
-		verify(validationContext, never()).addError(anyString(), any(IErrorCode.class), anyString());
-		verify(validationContext, never()).addErrorAtCurrentLocation(any(IErrorCode.class), anyString());
+		verify(validationContext, never()).addError(anyString(), any(IErrorLocationType.class), any(IErrorCode.class), anyString());
+		verify(validationContext, never()).addErrorAtCurrentLocation(any(IErrorLocationType.class), any(IErrorCode.class), anyString());
 	}
 
 	@Test
@@ -119,6 +120,7 @@ public class BeanValidationPreprocessorUnitTests {
 
 		final NotNullErrorCode notNullErrorCode = new NotNullErrorCode();
 		final LengthErrorCode lnErrorCode = new LengthErrorCode();
+		IErrorLocationType errorLocationType = null; 
 
 		processor.setConstraintCode(new IConstraintCode() {
 			@Override
@@ -138,14 +140,14 @@ public class BeanValidationPreprocessorUnitTests {
 		assertTrue(processor.process(user, config));
 
 		// ensure that all errors have been added at the correct location and with the correct code
-		verify(validationContext, times(1)).addError(eq("/name"), eq(notNullErrorCode), eq("This value must not be null."));
-		verify(validationContext, times(1)).addError(eq("/address/street"), eq(notNullErrorCode), eq("This value must not be null."));
-		verify(validationContext, times(1)).addError(eq("/applications/0/name"), eq(notNullErrorCode), eq("This value must not be null."));
-		verify(validationContext, times(1)).addError(eq("/applications/1/name"), eq(lnErrorCode), eq("This value must be at most 20 characters long."));
+		verify(validationContext, times(1)).addError(eq("/name"), eq(errorLocationType), eq(notNullErrorCode), eq("This value must not be null."));
+		verify(validationContext, times(1)).addError(eq("/address/street"), eq(errorLocationType), eq(notNullErrorCode), eq("This value must not be null."));
+		verify(validationContext, times(1)).addError(eq("/applications/0/name"), eq(errorLocationType), eq(notNullErrorCode), eq("This value must not be null."));
+		verify(validationContext, times(1)).addError(eq("/applications/1/name"), eq(errorLocationType), eq(lnErrorCode), eq("This value must be at most 20 characters long."));
 
 		// ensure that no other errors have been added
-		verify(validationContext, times(4)).addError(anyString(), any(IErrorCode.class), anyString());
-		verify(validationContext, never()).addErrorAtCurrentLocation(any(IErrorCode.class), anyString());
+		verify(validationContext, times(4)).addError(anyString(), any(IErrorLocationType.class), any(IErrorCode.class), anyString());
+		verify(validationContext, never()).addErrorAtCurrentLocation(any(IErrorLocationType.class), any(IErrorCode.class), anyString());
 	}
 
 	@Test
@@ -159,6 +161,7 @@ public class BeanValidationPreprocessorUnitTests {
 		patch.setAddress(new AddressTO()); // address is set with no street; street should be invalid
 
 		final NotNullErrorCode notNullErrorCode = new NotNullErrorCode();
+		IErrorLocationType errorLocationType = null; 
 
 		processor.setConstraintCode(new IConstraintCode() {
 			@Override
@@ -171,12 +174,12 @@ public class BeanValidationPreprocessorUnitTests {
 		assertTrue(processor.process(patch, config));
 
 		// ensure that an error was added for the middle name
-		verify(validationContext, times(1)).addError(eq("/middleName"), eq(notNullErrorCode), eq("This value must not be null."));
-		verify(validationContext, times(1)).addError(eq("/address/street"), eq(notNullErrorCode), eq("This value must not be null."));
+		verify(validationContext, times(1)).addError(eq("/middleName"), eq(errorLocationType), eq(notNullErrorCode), eq("This value must not be null."));
+		verify(validationContext, times(1)).addError(eq("/address/street"), eq(errorLocationType), eq(notNullErrorCode), eq("This value must not be null."));
 
 		// ensure that no other errors have been added
-		verify(validationContext, times(2)).addError(anyString(), any(IErrorCode.class), anyString());
-		verify(validationContext, never()).addErrorAtCurrentLocation(any(IErrorCode.class), anyString());
+		verify(validationContext, times(2)).addError(anyString(), any(IErrorLocationType.class), any(IErrorCode.class), anyString());
+		verify(validationContext, never()).addErrorAtCurrentLocation(any(IErrorLocationType.class), any(IErrorCode.class), anyString());
 	}
 
 	@Test
@@ -189,6 +192,7 @@ public class BeanValidationPreprocessorUnitTests {
 		// last name not set; should be validated because patch validation is not enabled
 
 		final NotNullErrorCode notNullErrorCode = new NotNullErrorCode();
+		IErrorLocationType errorLocationType = null; 
 		
 		processor.setConstraintCode(new IConstraintCode() {
 			@Override
@@ -200,12 +204,12 @@ public class BeanValidationPreprocessorUnitTests {
 		assertTrue(processor.process(patch, config));
 
 		// ensure that an error was added for the middle name
-		verify(validationContext, times(1)).addError(eq("/middleName"), eq(notNullErrorCode), eq("This value must not be null."));
-		verify(validationContext, times(1)).addError(eq("/lastName"), eq(notNullErrorCode), eq("This value must not be null."));
+		verify(validationContext, times(1)).addError(eq("/middleName"), eq(errorLocationType), eq(notNullErrorCode), eq("This value must not be null."));
+		verify(validationContext, times(1)).addError(eq("/lastName"), eq(errorLocationType), eq(notNullErrorCode), eq("This value must not be null."));
 
 		// ensure that no other errors have been added
-		verify(validationContext, times(2)).addError(anyString(), any(IErrorCode.class), anyString());
-		verify(validationContext, never()).addErrorAtCurrentLocation(any(IErrorCode.class), anyString());
+		verify(validationContext, times(2)).addError(anyString(), any(IErrorLocationType.class), any(IErrorCode.class), anyString());
+		verify(validationContext, never()).addErrorAtCurrentLocation(any(IErrorLocationType.class), any(IErrorCode.class), anyString());
 	}
 	
 	@Test

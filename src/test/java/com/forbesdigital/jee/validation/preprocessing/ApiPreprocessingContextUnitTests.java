@@ -134,7 +134,7 @@ public class ApiPreprocessingContextUnitTests {
 		assertNotNull(context.getApiErrorResponse());
 
 		// add an error to the validation context
-		context.getValidationContext().addError(null, errorCode(1), "foo");
+		context.getValidationContext().addError(null, null, errorCode(1), "foo");
 
 		// check that the error was added to the API error response through the validation context
 		assertThat(context.getApiErrorResponse(), isApiErrorResponseObject(422).withError(1, null, "foo"));
@@ -191,8 +191,8 @@ public class ApiPreprocessingContextUnitTests {
 		doAnswer(new Answer() {
 			@Override
 			public Object answer(InvocationOnMock invocation) throws Throwable {
-				((IPreprocessingConfig) invocation.getArguments()[1]).getValidationContext().addError(null, errorCode(1), "foo");
-				((IPreprocessingConfig) invocation.getArguments()[1]).getValidationContext().addError(null, errorCode(2), "bar");
+				((IPreprocessingConfig) invocation.getArguments()[1]).getValidationContext().addError(null, null, errorCode(1), "foo");
+				((IPreprocessingConfig) invocation.getArguments()[1]).getValidationContext().addError(null, null, errorCode(2), "bar");
 				return true;
 			}
 		}).when(preprocessor).process(anyObject(), same(context));

@@ -27,7 +27,7 @@ public class PreprossessingAnswers  {
 		
 		@Override
 		public Boolean answer(InvocationOnMock invocation) throws Throwable {
-			((IPreprocessingConfig) invocation.getArguments()[1]).getValidationContext().addError(null, errorCode, message);
+			((IPreprocessingConfig) invocation.getArguments()[1]).getValidationContext().addError(null, null, errorCode, message);
 			return true;
 		}
 	}

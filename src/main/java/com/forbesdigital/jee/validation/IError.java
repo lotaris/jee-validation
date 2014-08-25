@@ -13,5 +13,7 @@ public interface IError {
 
 	String getLocation();
 
+	IErrorLocationType getLocationType();
+	
 	IErrorCode getCode();
 }

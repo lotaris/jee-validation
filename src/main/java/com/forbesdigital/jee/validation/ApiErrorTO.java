@@ -21,16 +21,21 @@ public class ApiErrorTO implements IError {
 	private String location;
 	@JsonIgnore
 	private IErrorCode code;
+	@JsonIgnore
+	private IErrorLocationType locationType;
 
 	//<editor-fold defaultstate="collapsed" desc="Constructors">
-	public ApiErrorTO(String message, IErrorCode code) {
+	// TODO - remove locationType from this constructor after all usages of this class are updated
+	public ApiErrorTO(String message, IErrorLocationType locationType, IErrorCode code) {
 		this.message = message;
+		this.locationType = locationType;
 		this.code = code;
 	}
 
-	public ApiErrorTO(String message, String location, IErrorCode code) {
+	public ApiErrorTO(String message, String location, IErrorLocationType locationType, IErrorCode code) {
 		this.message = message;
 		this.location = location;
+		this.locationType = locationType;
 		this.code = code;
 	}
 	//</editor-fold>
@@ -40,6 +45,11 @@ public class ApiErrorTO implements IError {
 		return code != null ? code.getCode() : null;
 	}
 
+	@JsonProperty("locationType")
+	public String getStringType() {
+		return locationType != null ? locationType.getLocationType(): null;
+	}
+	
 	//<editor-fold defaultstate="collapsed" desc="Getters & Setters">
 	@Override
 	public String getMessage() {
@@ -66,6 +76,15 @@ public class ApiErrorTO implements IError {
 
 	public void setLocation(String location) {
 		this.location = location;
+	}
+
+	@Override
+	public IErrorLocationType getLocationType() {
+		return locationType;
+	}
+
+	public void setLocationType(IErrorLocationType locationType) {
+		this.locationType = locationType;
 	}
 	//</editor-fold>
 }
