@@ -11,13 +11,13 @@ package com.forbesdigital.jee.validation;
  */
 public class ApiErrorsException extends Exception {
 
-	private ApiErrorResponseTO errorResponse;
+	private ApiErrorResponse errorResponse;
 
-	public ApiErrorsException(ApiErrorResponseTO errorResponse) {
+	public ApiErrorsException(ApiErrorResponse errorResponse) {
 		this.errorResponse = errorResponse;
 	}
 
-	public ApiErrorResponseTO getErrorResponse() {
+	public ApiErrorResponse getErrorResponse() {
 		return errorResponse;
 	}
 }

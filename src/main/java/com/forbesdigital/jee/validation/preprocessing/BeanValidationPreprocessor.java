@@ -1,7 +1,6 @@
 package com.forbesdigital.jee.validation.preprocessing;
 
 import com.forbesdigital.jee.validation.AbstractPatchTransferObject;
-import com.forbesdigital.jee.validation.ApiErrorResponseTO;
 import com.forbesdigital.jee.validation.IConstraintConverter;
 import com.forbesdigital.jee.validation.IErrorCode;
 import com.forbesdigital.jee.validation.IErrorLocationType;
@@ -17,7 +16,7 @@ import javax.validation.ValidatorFactory;
 
 /**
  * Applies all constraint validation annotations (bean validations) on the processed object. If the
- * object is invalid, errors are collected into the {@link ApiErrorResponseTO} returned by
+ * object is invalid, errors are collected into the {@link ApiErrorResponse} returned by
  * {@link IPreprocessingConfig#getErrors()}.
  *
  * <h2>JSON Wrappers</h2>

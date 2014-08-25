@@ -38,7 +38,7 @@ public class JsonValidationContext implements IValidationContext {
 
 	@Override
 	public IValidationContext addError(String location, IErrorLocationType type, IErrorCode code, String message, Object... messageArgs) {
-		collector.addError(new ApiErrorTO(String.format(message, messageArgs), location(location), type, code));
+		collector.addError(new ApiError(String.format(message, messageArgs), location(location), type, code));
 		return this;
 	}
 

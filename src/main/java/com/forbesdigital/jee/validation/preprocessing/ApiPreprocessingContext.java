@@ -2,7 +2,7 @@ package com.forbesdigital.jee.validation.preprocessing;
 
 import com.forbesdigital.jee.validation.AbstractPatchTransferObject;
 import com.forbesdigital.jee.validation.AbstractValidator;
-import com.forbesdigital.jee.validation.ApiErrorResponseTO;
+import com.forbesdigital.jee.validation.ApiErrorResponse;
 import com.forbesdigital.jee.validation.ApiErrorsException;
 import com.forbesdigital.jee.validation.IPatchObject;
 import com.forbesdigital.jee.validation.IValidationContext;
@@ -18,7 +18,7 @@ import javax.validation.groups.Default;
  * {@link PreprocessingChain}).
  *
  * <p>The <tt>process</tt> method will throw an {@link ApiErrorsException} if any errors were added
- * to the internal {@link ApiErrorResponseTO} used as an error collector. This exception will be
+ * to the internal {@link ApiErrorResponse} used as an error collector. This exception will be
  * mapped to an HTTP 422 unprocessable entity.</p>
  *
  * <p><pre>
@@ -41,7 +41,7 @@ public class ApiPreprocessingContext implements IPreprocessingConfig {
 	public static final int UNPROCESSABLE_ENTITY = 422;
 	
 	private IPreprocessor preprocessor;
-	private ApiErrorResponseTO apiErrorResponse;
+	private ApiErrorResponse apiErrorResponse;
 	private IValidationContext validationContext;
 	private Class[] validationGroups;
 	private List<IValidator> validators;
@@ -51,7 +51,7 @@ public class ApiPreprocessingContext implements IPreprocessingConfig {
 
 	public ApiPreprocessingContext(IPreprocessor preprocessor) {
 		this.preprocessor = preprocessor;
-		this.apiErrorResponse = new ApiErrorResponseTO(UNPROCESSABLE_ENTITY);
+		this.apiErrorResponse = new ApiErrorResponse(UNPROCESSABLE_ENTITY);
 		this.validationContext = new JsonValidationContext(apiErrorResponse);
 		this.validationGroups = new Class[]{};
 		this.validators = new ArrayList<>();
@@ -158,7 +158,7 @@ public class ApiPreprocessingContext implements IPreprocessingConfig {
 	/**
 	 * Sets whether the processing will throw an exception when errors are added to the error
 	 * collector. Set to false to disable the exception, then you can retrieve the
-	 * {@link ApiErrorResponseTO} and its errors with {@link #getApiErrorResponse()}.
+	 * {@link ApiErrorResponse} and its errors with {@link #getApiErrorResponse()}.
 	 *
 	 * @param failOnErrors if true, an {@link ApiErrorsException} will be thrown if any errors are
 	 * added to the error collector
@@ -194,7 +194,7 @@ public class ApiPreprocessingContext implements IPreprocessingConfig {
 	}
 
 	//<editor-fold defaultstate="collapsed" desc="Getters & Setters">
-	public ApiErrorResponseTO getApiErrorResponse() {
+	public ApiErrorResponse getApiErrorResponse() {
 		return apiErrorResponse;
 	}
 	//</editor-fold>

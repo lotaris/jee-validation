@@ -15,7 +15,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
  *
  * @author Simon Oulevay (simon.oulevay@lotaris.com)
  */
-public class ApiErrorTO implements IError {
+public class ApiError implements IError {
 
 	private String message;
 	private String location;
@@ -25,14 +25,12 @@ public class ApiErrorTO implements IError {
 	private IErrorLocationType locationType;
 
 	//<editor-fold defaultstate="collapsed" desc="Constructors">
-	// TODO - remove locationType from this constructor after all usages of this class are updated
-	public ApiErrorTO(String message, IErrorLocationType locationType, IErrorCode code) {
+	public ApiError(String message, IErrorCode code) {
 		this.message = message;
-		this.locationType = locationType;
 		this.code = code;
 	}
 
-	public ApiErrorTO(String message, String location, IErrorLocationType locationType, IErrorCode code) {
+	public ApiError(String message, String location, IErrorLocationType locationType, IErrorCode code) {
 		this.message = message;
 		this.location = location;
 		this.locationType = locationType;
