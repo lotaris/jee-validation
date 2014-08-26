@@ -39,7 +39,7 @@ public class ApiError implements IError {
 	//</editor-fold>
 
 	@JsonProperty("locationType")
-	public String getStringType() {
+	public String getStringLocationType() {
 		return locationType != null ? locationType.getLocationType(): null;
 	}
 	
