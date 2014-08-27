@@ -17,11 +17,13 @@ import org.codehaus.jackson.annotate.JsonProperty;
  */
 public class ApiError implements IError {
 
+	@JsonIgnore
 	private String message;
 	@JsonIgnore
 	private IErrorCode code;
 	@JsonIgnore
 	private IErrorLocationType locationType;
+	@JsonIgnore
 	private String location;
 
 	//<editor-fold defaultstate="collapsed" desc="Constructors">
@@ -38,22 +40,29 @@ public class ApiError implements IError {
 	}
 	//</editor-fold>
 
-	@JsonProperty("locationType")
-	public String getStringLocationType() {
-		return locationType != null ? locationType.getLocationType(): null;
-	}
-	
-	@JsonProperty("code")
-	public Integer getNumericCode() {
-		return code != null ? code.getCode() : null;
-	}
-
-	//<editor-fold defaultstate="collapsed" desc="Getters & Setters">
+	@JsonProperty("message")
 	@Override
 	public String getMessage() {
 		return message;
 	}
 
+	@JsonProperty("code")
+	public Integer getNumericCode() {
+		return code != null ? code.getCode() : null;
+	}
+
+	@JsonProperty("locationType")
+	public String getStringLocationType() {
+		return locationType != null ? locationType.getLocationType(): null;
+	}
+
+	@JsonProperty("location")
+	@Override
+	public String getLocation() {
+		return location;
+	}
+
+	//<editor-fold defaultstate="collapsed" desc="Getters & Setters">
 	public void setMessage(String message) {
 		this.message = message;
 	}
@@ -74,11 +83,6 @@ public class ApiError implements IError {
 
 	public void setLocationType(IErrorLocationType locationType) {
 		this.locationType = locationType;
-	}
-
-	@Override
-	public String getLocation() {
-		return location;
 	}
 
 	public void setLocation(String location) {

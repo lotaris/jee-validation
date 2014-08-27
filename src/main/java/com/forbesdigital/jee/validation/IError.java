@@ -11,9 +11,9 @@ public interface IError {
 
 	String getMessage();
 
-	String getLocation();
+	IErrorCode getCode();
 
 	IErrorLocationType getLocationType();
-	
-	IErrorCode getCode();
+
+	String getLocation();
 }
