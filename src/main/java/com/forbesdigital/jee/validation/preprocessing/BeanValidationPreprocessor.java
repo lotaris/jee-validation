@@ -136,7 +136,11 @@ public class BeanValidationPreprocessor implements IPreprocessor {
 		return true;
 	}
 
-	// TODO: Comment
+	/**
+	 * Sets the constraint converter.
+	 * 
+	 * @param constraintConverter the constraint converter.
+	 */
 	public void setConstraintConverter(IConstraintConverter constraintConverter) {
 		this.constraintConverter = constraintConverter;
 	}

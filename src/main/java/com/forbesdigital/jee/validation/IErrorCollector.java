@@ -10,10 +10,7 @@ public interface IErrorCollector {
 	/**
 	 * Adds an error. Check previously added errors with <tt>hasErrors</tt>.
 	 *
-	 * @param message the error message
-	 * @param location a JSON Pointer (see http://tools.ietf.org/html/rfc6901) indicating which
-	 * value of the JSON document is invalid
-	 * @param code the code identifying the error type (e.g. invalid string length)
+	 * @param error the error
 	 * @return this collector
 	 */
 	IErrorCollector addError(IError error);
