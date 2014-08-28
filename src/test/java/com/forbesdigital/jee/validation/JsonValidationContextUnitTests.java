@@ -56,8 +56,8 @@ public class JsonValidationContextUnitTests {
 	@RoxableTest(key = "081129fccdcd")
 	public void validationContextShouldForwardAddErrorsAtTheCurrentLocationToItsErrorCollector() {
 
-		assertSame(context, context.addErrorAtCurrentLocation(null, code(), "foo"));
-		verify(collector).addError(argThat(isAnErrorWith("foo", "", null, lastCode)));
+		assertSame(context, context.addErrorAtCurrentLocation(code(), "foo"));
+		verify(collector).addError(argThat(isAnErrorWith("foo", "", "json", lastCode)));
 	}
 
 	@Test
@@ -72,8 +72,8 @@ public class JsonValidationContextUnitTests {
 	@RoxableTest(key = "e679dc0b2128")
 	public void validationContextShouldFormatErrorMessagesWithArgumentsAtCurrentLocation() {
 
-		assertSame(context, context.addErrorAtCurrentLocation(null, code(), "This message has arguments %s, %s and %s.", "a", "b", "c"));
-		verify(collector).addError(argThat(isAnErrorWith("This message has arguments a, b and c.", "", null, lastCode)));
+		assertSame(context, context.addErrorAtCurrentLocation(code(), "This message has arguments %s, %s and %s.", "a", "b", "c"));
+		verify(collector).addError(argThat(isAnErrorWith("This message has arguments a, b and c.", "", "json", lastCode)));
 	}
 
 	@Test
@@ -210,7 +210,7 @@ public class JsonValidationContextUnitTests {
 				assertEquals("/foo/bar/sub", context.location("/sub"));
 
 				context.addError("/name", locationType("locationType1"), null, "also broken");
-				context.addErrorAtCurrentLocation(locationType("locationType2"), null, "still broken");
+				context.addErrorAtCurrentLocation( null, "still broken");
 
 				final List<String> objects = Arrays.asList("baz1", "baz2", "baz3");
 				context.validateObjects(objects, "/baz", thirdLevelValidator);
@@ -237,7 +237,7 @@ public class JsonValidationContextUnitTests {
 		inOrder.verify(collector).addError(argThat(isAnErrorWith("fubar", "", "locationType0",null)));
 		inOrder.verify(collector).addError(argThat(isAnErrorWith("broken", null, null, 66)));
 		inOrder.verify(collector).addError(argThat(isAnErrorWith("also broken", "/foo/bar/name", "locationType1", null)));
-		inOrder.verify(collector).addError(argThat(isAnErrorWith("still broken", "/foo/bar", "locationType2", null)));
+		inOrder.verify(collector).addError(argThat(isAnErrorWith("still broken", "/foo/bar", "json", null)));
 		inOrder.verify(collector).addError(argThat(isAnErrorWith("definitely broken", "/foo/bar/baz/0/last", "locationType3", 22)));
 		inOrder.verify(collector).addError(argThat(isAnErrorWith("definitely broken", "/foo/bar/baz/1/last", "locationType3", 22)));
 		inOrder.verify(collector).addError(argThat(isAnErrorWith("definitely broken", "/foo/bar/baz/2/last", "locationType3", 22)));

@@ -113,7 +113,7 @@ public class BeanValidationPreprocessorUnitTests {
 
 		// ensure that no other errors have been added
 		verify(validationContext, never()).addError(anyString(), any(IErrorLocationType.class), any(IErrorCode.class), anyString());
-		verify(validationContext, never()).addErrorAtCurrentLocation(any(IErrorLocationType.class), any(IErrorCode.class), anyString());
+		verify(validationContext, never()).addErrorAtCurrentLocation(any(IErrorCode.class), anyString());
 	}
 
 	@Test
@@ -169,7 +169,7 @@ public class BeanValidationPreprocessorUnitTests {
 
 		// ensure that no other errors have been added
 		verify(validationContext, times(4)).addError(anyString(), any(IErrorLocationType.class), any(IErrorCode.class), anyString());
-		verify(validationContext, never()).addErrorAtCurrentLocation(any(IErrorLocationType.class), any(IErrorCode.class), anyString());
+		verify(validationContext, never()).addErrorAtCurrentLocation(any(IErrorCode.class), anyString());
 	}
 
 	@Test
@@ -206,7 +206,7 @@ public class BeanValidationPreprocessorUnitTests {
 
 		// ensure that no other errors have been added
 		verify(validationContext, times(2)).addError(anyString(), any(IErrorLocationType.class), any(IErrorCode.class), anyString());
-		verify(validationContext, never()).addErrorAtCurrentLocation(any(IErrorLocationType.class), any(IErrorCode.class), anyString());
+		verify(validationContext, never()).addErrorAtCurrentLocation(any(IErrorCode.class), anyString());
 	}
 
 	@Test
@@ -241,7 +241,7 @@ public class BeanValidationPreprocessorUnitTests {
 
 		// ensure that no other errors have been added
 		verify(validationContext, times(2)).addError(anyString(), any(IErrorLocationType.class), any(IErrorCode.class), anyString());
-		verify(validationContext, never()).addErrorAtCurrentLocation(any(IErrorLocationType.class), any(IErrorCode.class), anyString());
+		verify(validationContext, never()).addErrorAtCurrentLocation(any(IErrorCode.class), anyString());
 	}
 	
 	@Test

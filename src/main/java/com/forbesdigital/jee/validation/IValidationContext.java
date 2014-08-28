@@ -44,14 +44,13 @@ public interface IValidationContext {
 	 * <p>The current location changes when you call other validators with the
 	 * <tt>validateObject(s)</tt> methods.</p>
 	 *
-	 * @param type the type of the error
 	 * @param code the code identifying the error type (e.g. invalid string length)
 	 * @param message the error message
 	 * @param messageArgs optional arguments to be interpolated into the message (see
 	 * {@link String#format(java.lang.String, java.lang.Object[])})
 	 * @return this context
 	 */
-	IValidationContext addErrorAtCurrentLocation(IErrorLocationType type, IErrorCode code, String message, Object... messageArgs);
+	IValidationContext addErrorAtCurrentLocation(IErrorCode code, String message, Object... messageArgs);
 
 	/**
 	 * Indicates whether this context has errors.
