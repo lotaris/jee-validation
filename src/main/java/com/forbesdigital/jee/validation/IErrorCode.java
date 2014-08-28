@@ -15,7 +15,7 @@ public interface IErrorCode {
 	int getCode();
 	
 	/**
-	 * Returns the default http status code of the error the error.
+	 * Returns the default http status code of the error.
 	 *
 	 * @return an integer http status code
 	 */

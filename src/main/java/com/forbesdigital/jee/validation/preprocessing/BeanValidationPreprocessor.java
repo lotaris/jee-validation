@@ -64,7 +64,7 @@ public class BeanValidationPreprocessor implements IPreprocessor {
 	public boolean process(Object object, IPreprocessingConfig config) {
 		// TODO: Add proper error message for null constraint code
 		if (constraintConverter == null) {
-			throw new IllegalStateException("No constraint code is configured.");
+			throw new IllegalStateException("No constraint converter is configured.");
 		}
 		
 		// Get the patch object if patch validation is enabled.
