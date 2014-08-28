@@ -18,9 +18,9 @@ import org.codehaus.jackson.annotate.JsonIgnore;
  *
  * @author Simon Oulevay (simon.oulevay@lotaris.com)
  */
-public class ApiErrorResponseTO implements IErrorCollector {
+public class ApiErrorResponse implements IErrorCollector {
 
-	private List<ApiErrorTO> errors;
+	private List<ApiError> errors;
 	@JsonIgnore
 	private int httpStatusCode;
 	/**
@@ -39,13 +39,13 @@ public class ApiErrorResponseTO implements IErrorCollector {
 	private Set<Integer> knownErrorCodes;
 
 	/**
-	 * Constructs an empty error response with no error message. Use {@link #add(ApiErrorTO)} to add
+	 * Constructs an empty error response with no error message. Use {@link #add(ApiError)} to add
 	 * error messages.
 	 *
 	 * @param httpStatusCode the associated HTTP status code
 	 * @throws IllegalArgumentException if the status code is null or not in the 4xx or 5xx range
 	 */
-	public ApiErrorResponseTO(int httpStatusCode) {
+	public ApiErrorResponse(int httpStatusCode) {
 		if (httpStatusCode < 400 || httpStatusCode > 599) {
 			throw new IllegalArgumentException("HTTP status code for an API error response must be in the 4xx or 5xx range, got " + httpStatusCode);
 		}
@@ -63,12 +63,26 @@ public class ApiErrorResponseTO implements IErrorCollector {
 	 * @throws IllegalArgumentException if the code's default status code is null or not in the 4xx
 	 * or 5xx range
 	 */
-	public ApiErrorResponseTO(String message, IErrorCode errorCode) {
+	public ApiErrorResponse(String message, IErrorCode errorCode) {
+		this(message, errorCode, null, null);
+	}
+	
+	/**
+	 * Constructs a new error response with one error message.
+	 *
+	 * @param message the detail message
+	 * @param errorCode the code identifying the error (must have a default HTTP status code)
+	 * @param locationType the location type
+	 * @param location the location of the error
+	 * @throws IllegalArgumentException if the code's default status code is null or not in the 4xx
+	 * or 5xx range
+	 */
+	public ApiErrorResponse(String message, IErrorCode errorCode, IErrorLocationType locationType, String location) {
 		this(errorCode.getDefaultHttpStatusCode());
-		addError(new ApiErrorTO(message, errorCode));
+		addError(new ApiError(message, errorCode, locationType, location));
 	}
 
-	private void addError(ApiErrorTO error) {
+	private void addError(ApiError error) {
 
 		errors.add(error);
 
@@ -85,14 +99,18 @@ public class ApiErrorResponseTO implements IErrorCollector {
 			String location = error.getLocation();
 			while (!location.isEmpty()) {
 				knownErrorLocations.add(location);
-				location = location.replaceFirst("\\/[^\\/]*$", "");
+				if (location.contains("/")) {
+					location = location.replaceFirst("\\/[^\\/]*$", "");
+				} else {
+					break;
+				}
 			}
 		}
 	}
 
 	@Override
 	public IErrorCollector addError(IError error) {
-		addError(error instanceof ApiErrorTO ? ((ApiErrorTO) error) : new ApiErrorTO(error.getMessage(), error.getLocation(), error.getCode()));
+		addError(error instanceof ApiError ? ((ApiError) error) : new ApiError(error.getMessage(), error.getCode(), error.getLocationType(), error.getLocation()));
 		return this;
 	}
 
@@ -123,7 +141,7 @@ public class ApiErrorResponseTO implements IErrorCollector {
 	 *
 	 * @return the list of errors added to this response, or null if there are none
 	 */
-	public List<ApiErrorTO> getErrors() {
+	public List<ApiError> getErrors() {
 		return Collections.unmodifiableList(errors);
 	}
 	//</editor-fold>

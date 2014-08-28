@@ -1,9 +1,9 @@
 package com.forbesdigital.jee.validation.preprocessing;
 
 import com.forbesdigital.jee.validation.AbstractPatchTransferObject;
-import com.forbesdigital.jee.validation.ApiErrorResponseTO;
-import com.forbesdigital.jee.validation.IConstraintCode;
+import com.forbesdigital.jee.validation.IConstraintConverter;
 import com.forbesdigital.jee.validation.IErrorCode;
+import com.forbesdigital.jee.validation.IErrorLocationType;
 import com.forbesdigital.jee.validation.IJsonWrapper;
 import com.forbesdigital.jee.validation.IPatchObject;
 import com.forbesdigital.jee.validation.IValidationContext;
@@ -16,7 +16,7 @@ import javax.validation.ValidatorFactory;
 
 /**
  * Applies all constraint validation annotations (bean validations) on the processed object. If the
- * object is invalid, errors are collected into the {@link ApiErrorResponseTO} returned by
+ * object is invalid, errors are collected into the {@link ApiErrorResponse} returned by
  * {@link IPreprocessingConfig#getErrors()}.
  *
  * <h2>JSON Wrappers</h2>
@@ -58,13 +58,13 @@ public class BeanValidationPreprocessor implements IPreprocessor {
 	@Inject
 	private ValidatorFactory validatorFactory;
 
-	private IConstraintCode contraintCode;
+	private IConstraintConverter constraintConverter;
 	
 	@Override
 	public boolean process(Object object, IPreprocessingConfig config) {
 		// TODO: Add proper error message for null constraint code
-		if (contraintCode == null) {
-			throw new IllegalStateException("No constraint code is configured.");
+		if (constraintConverter == null) {
+			throw new IllegalStateException("No constraint converter is configured.");
 		}
 		
 		// Get the patch object if patch validation is enabled.
@@ -136,9 +136,13 @@ public class BeanValidationPreprocessor implements IPreprocessor {
 		return true;
 	}
 
-	// TODO: Comment
-	public void setConstraintCode(IConstraintCode constraintCode) {
-		this.contraintCode = constraintCode;
+	/**
+	 * Sets the constraint converter.
+	 * 
+	 * @param constraintConverter the constraint converter.
+	 */
+	public void setConstraintConverter(IConstraintConverter constraintConverter) {
+		this.constraintConverter = constraintConverter;
 	}
 	
 	/**
@@ -153,9 +157,10 @@ public class BeanValidationPreprocessor implements IPreprocessor {
 
 		// extract the error code, if any
 		final Class<? extends Annotation> annotationType = violation.getConstraintDescriptor().getAnnotation().annotationType();
-		final IErrorCode validationCode = contraintCode.getErrorCode(annotationType);
+		final IErrorCode validationCode = constraintConverter.getErrorCode(annotationType);
+		final IErrorLocationType validationType = constraintConverter.getErrorLocationType(annotationType);
 
 		// add the error to the validation context
-		context.addError(pointer.toString(), validationCode != null ? validationCode : null, violation.getMessage());
+		context.addError(pointer.toString(), validationType, validationCode, violation.getMessage());
 	}
 }

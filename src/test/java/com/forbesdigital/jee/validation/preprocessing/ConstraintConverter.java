@@ -13,7 +13,9 @@ import java.lang.annotation.Target;
 @Documented
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ConstraintCode {
+public @interface ConstraintConverter {
 
-	int value();
+	String locationType();
+	
+	int code();
 }

@@ -10,7 +10,7 @@ import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.*;
 
 /**
- * @see ApiErrorResponseTO
+ * @see ApiErrorResponse
  * @author Simon Oulevay (simon.oulevay@lotaris.com)
  */
 @RoxableTestClass(tags = {"api", "apiErrorResponse"})
@@ -19,7 +19,7 @@ public class ApiErrorResponseUnitTests {
 	@Test
 	@RoxableTest(key = "f243618b7701")
 	public void apiErrorResponseShouldConstructEmptyResponsesWithTheSpecifiedStatusCode() {
-		final ApiErrorResponseTO res = new ApiErrorResponseTO(403);
+		final ApiErrorResponse res = new ApiErrorResponse(403);
 		assertEquals("API error response should be empty by default", res.getErrors().size(), 0);
 		assertEquals(403, res.getHttpStatusCode());
 	}
@@ -28,7 +28,7 @@ public class ApiErrorResponseUnitTests {
 	@RoxableTest(key = "4661857863de")
 	public void apiErrorResponseShouldNotAcceptSuccessfulStatusCodes() {
 		try {
-			new ApiErrorResponseTO(200);
+			new ApiErrorResponse(200);
 			fail("Expected an exception to be thrown with status code 200 (not in the 4xx or 5xx range); nothing was thrown");
 		} catch (IllegalArgumentException iae) {
 			assertThat(iae.getMessage(), equalTo("HTTP status code for an API error response must be in the 4xx or 5xx range, got 200"));
@@ -39,28 +39,28 @@ public class ApiErrorResponseUnitTests {
 	@RoxableTest(key = "2f5009e03daa")
 	public void apiErrorResponseShouldAddErrorsToItsErrorList() {
 
-		final ApiErrorResponseTO res = badRequest();
+		final ApiErrorResponse res = badRequest();
 
-		ApiErrorTO error = new ApiErrorTO("1", code(1));
+		ApiError error = new ApiError("1", code(1));
 		res.addError(error);
 		assertThat(res.getErrors().size(), equalTo(1));
-		assertThat(res.getErrors(), hasItem(isAnApiErrorWith("1", null, 1)));
+		assertThat(res.getErrors(), hasItem(isAnApiErrorWith("1", null, null, 1)));
 
-		error = new ApiErrorTO("2", code(2));
+		error = new ApiError("2", code(2));
 		res.addError(error);
 		assertThat(res.getErrors().size(), equalTo(2));
-		assertThat(res.getErrors(), hasItem(isAnApiErrorWith("1", null, 1)));
-		assertThat(res.getErrors(), hasItem(isAnApiErrorWith("2", null, 2)));
+		assertThat(res.getErrors(), hasItem(isAnApiErrorWith("1", null, null, 1)));
+		assertThat(res.getErrors(), hasItem(isAnApiErrorWith("2", null, null, 2)));
 	}
 
 	@Test
 	@RoxableTest(key = "705523ce682d")
 	public void apiErrorResponseShouldCheckWhetherItHasErrors() {
 
-		final ApiErrorResponseTO res = badRequest();
+		final ApiErrorResponse res = badRequest();
 		assertFalse(res.hasErrors());
 
-		res.addError(new ApiErrorTO("1", code(1)));
+		res.addError(new ApiError("1", code(1)));
 		assertTrue(res.hasErrors());
 	}
 
@@ -68,11 +68,12 @@ public class ApiErrorResponseUnitTests {
 	@RoxableTest(key = "7395802ef85f")
 	public void apiErrorResponseShouldCheckWhetherItHasErrorsByLocation() {
 
-		final ApiErrorResponseTO res = badRequest();
-		res.addError(new ApiErrorTO("1", code(1))).addError(new ApiErrorTO("2", "/bar", code(2)));
+		final ApiErrorResponse res = badRequest();
+		res.addError(new ApiError("1", code(1)))
+				.addError(new ApiError("2", code(2), locationType("locationType"), "/bar"));
 		assertFalse(res.hasErrors("/foo"));
 
-		res.addError(new ApiErrorTO("3", "/foo", code(3)));
+		res.addError(new ApiError("3", code(3), locationType("locationType"), "/foo"));
 		assertTrue(res.hasErrors("/foo"));
 	}
 
@@ -80,11 +81,11 @@ public class ApiErrorResponseUnitTests {
 	@RoxableTest(key = "e64c05d6bdb3")
 	public void apiErrorResponseShouldCheckWhetherItHasErrorsWithNoLocation() {
 
-		final ApiErrorResponseTO res = badRequest();
-		res.addError(new ApiErrorTO("1", "/1", code(1)));
+		final ApiErrorResponse res = badRequest();
+		res.addError(new ApiError("1", code(1), locationType("locationType"), "/1"));
 		assertFalse(res.hasErrors((String) null));
 
-		res.addError(new ApiErrorTO("2", code(2)));
+		res.addError(new ApiError("2", code(2)));
 		assertTrue(res.hasErrors((String) null));
 	}
 
@@ -92,8 +93,9 @@ public class ApiErrorResponseUnitTests {
 	@RoxableTest(key = "4d73535fa505")
 	public void apiErrorResponseShouldCheckWhetherItHasErrorsByLocationIncludingSubLocations() {
 
-		final ApiErrorResponseTO res = badRequest();
-		res.addError(new ApiErrorTO("foo", "/person/name", code(1))).addError(new ApiErrorTO("bar", "/person/children/0/name", code(2)));
+		final ApiErrorResponse res = badRequest();
+		res.addError(new ApiError("foo", code(1), locationType("locationType"), "/person/name"))
+				.addError(new ApiError("bar", code(2), locationType("locationType"), "/person/children/0/name"));
 
 		assertTrue(res.hasErrors("/person"));
 		assertTrue(res.hasErrors("/person/name"));
@@ -106,8 +108,9 @@ public class ApiErrorResponseUnitTests {
 	@RoxableTest(key = "bf6669b33829")
 	public void apiErrorResponseShouldNotIncludePartialMatchesWhenCheckingWhetherItHasErrorsByLocation() {
 
-		final ApiErrorResponseTO res = badRequest();
-		res.addError(new ApiErrorTO("foo", "/person/name", code(1))).addError(new ApiErrorTO("bar", "/person/children/0/name", code(2)));
+		final ApiErrorResponse res = badRequest();
+		res.addError(new ApiError("foo", code(1), locationType("locationType"), "/person/name"))
+				.addError(new ApiError("bar", code(2), locationType("locationType"), "/person/children/0/name"));
 
 		assertFalse(res.hasErrors("/pers"));
 		assertFalse(res.hasErrors("/person/child"));
@@ -119,11 +122,13 @@ public class ApiErrorResponseUnitTests {
 	@RoxableTest(key = "b811721b482b")
 	public void apiErrorResponseShouldCheckWhetherItHasErrorsByCode() {
 
-		final ApiErrorResponseTO res = badRequest();
-		res.addError(new ApiErrorTO("1", null)).addError(new ApiErrorTO("2", code(2))).addError(new ApiErrorTO("3", "/3", code(3)));
+		final ApiErrorResponse res = badRequest();
+		res.addError(new ApiError("1", null))
+				.addError(new ApiError("2", code(2)))
+				.addError(new ApiError("3", code(3), locationType("locationType"), "/3"));
 		assertFalse(res.hasErrors(code(4)));
 
-		res.addError(new ApiErrorTO("4", code(4)));
+		res.addError(new ApiError("4", code(4)));
 		assertTrue(res.hasErrors(code(4)));
 	}
 
@@ -131,27 +136,28 @@ public class ApiErrorResponseUnitTests {
 	@RoxableTest(key = "2d996209563e")
 	public void apiErrorResponseShouldCheckWhetherItHasErrorsWithNoCode() {
 
-		final ApiErrorResponseTO res = badRequest();
-		res.addError(new ApiErrorTO("1", code(1)));
+		final ApiErrorResponse res = badRequest();
+		res.addError(new ApiError("1", code(1)));
 		assertFalse(res.hasErrors((IErrorCode) null));
 
-		res.addError(new ApiErrorTO("2", null));
+		res.addError(new ApiError("2", null));
 		assertTrue(res.hasErrors((IErrorCode) null));
 	}
 
-	private static BaseMatcher<ApiErrorTO> isAnApiErrorWith(final String message, final String location, final Integer code) {
-		return new BaseMatcher<ApiErrorTO>() {
+	private static BaseMatcher<ApiError> isAnApiErrorWith(final String message, final String location, final String locationType, final Integer code) {
+		return new BaseMatcher<ApiError>() {
 			@Override
 			public boolean matches(Object item) {
 
-				if (!(item instanceof ApiErrorTO)) {
+				if (!(item instanceof ApiError)) {
 					return false;
 				}
 
-				final IError error = (ApiErrorTO) item;
+				final IError error = (ApiError) item;
 
 				return message.equals(error.getMessage())
 						&& (location != null ? location.equals(error.getLocation()) : error.getLocation() == null)
+						&& (locationType != null ? locationType.equals(error.getLocationType().getLocationType()) : error.getLocationType() == null)
 						&& (code != null ? error.getCode() != null && code.equals(error.getCode().getCode()) : error.getCode() == null);
 			}
 
@@ -159,13 +165,14 @@ public class ApiErrorResponseUnitTests {
 			public void describeTo(Description description) {
 				description.appendText(IError.class.getSimpleName() + " with message \"" + message + "\""
 						+ " and location \"" + location + "\""
+						+ " and locationType \"" + locationType + "\""
 						+ " and code " + code);
 			}
 		};
 	}
 
-	private static ApiErrorResponseTO badRequest() {
-		return new ApiErrorResponseTO(400);
+	private static ApiErrorResponse badRequest() {
+		return new ApiErrorResponse(400);
 	}
 
 	private static IErrorCode code(final int code) {
@@ -182,4 +189,16 @@ public class ApiErrorResponseUnitTests {
 			}
 		};
 	}
+
+	private static IErrorLocationType locationType(final String locationType) {
+		return new IErrorLocationType() {
+
+			@Override
+			public String getLocationType() {
+				return locationType;
+			}
+
+		};
+	}
+
 }

@@ -1,9 +1,10 @@
 package com.forbesdigital.jee.validation.preprocessing;
 
 import com.forbesdigital.jee.validation.AbstractConstraintValidator;
-import com.forbesdigital.jee.validation.IConstraintCode;
+import com.forbesdigital.jee.validation.IConstraintConverter;
 import com.forbesdigital.jee.validation.IConstraintValidationContext;
 import com.forbesdigital.jee.validation.IErrorCode;
+import com.forbesdigital.jee.validation.IErrorLocationType;
 import com.forbesdigital.jee.validation.IPatchObject;
 import com.forbesdigital.jee.validation.IValidationContext;
 import com.lotaris.rox.annotations.RoxableTest;
@@ -58,21 +59,38 @@ public class BeanValidationPreprocessorUnitTests {
 		when(config.getValidators()).thenReturn(Collections.EMPTY_LIST);
 		when(config.isPatchValidationEnabled()).thenReturn(false);
 
-		processor.setConstraintCode(new IConstraintCode() {
+		processor.setConstraintConverter(new IConstraintConverter() {
 			@Override
 			public IErrorCode getErrorCode(Class<? extends Annotation> annotationType) {
-				final ConstraintCode code = annotationType.getAnnotation(ConstraintCode.class);
+				final ConstraintConverter converter = annotationType.getAnnotation(ConstraintConverter.class);
 				
-				if (code != null) {
+				if (converter != null) {
 					return new IErrorCode() {
 						@Override
 						public int getCode() {
-							return code.value();
+							return converter.code();
 						}
 
 						@Override
 						public int getDefaultHttpStatusCode() {
 							return 200;
+						}
+					};
+				}
+				else {
+					return null;
+				}
+			}
+
+			@Override
+			public IErrorLocationType getErrorLocationType(Class<? extends Annotation> annotationType) {
+				final ConstraintConverter converter = annotationType.getAnnotation(ConstraintConverter.class);
+				
+				if (converter != null) {
+					return new IErrorLocationType() {
+						@Override
+						public String getLocationType() {
+							return converter.locationType();
 						}
 					};
 				}
@@ -94,7 +112,7 @@ public class BeanValidationPreprocessorUnitTests {
 		assertTrue(processor.process(user, config));
 
 		// ensure that no other errors have been added
-		verify(validationContext, never()).addError(anyString(), any(IErrorCode.class), anyString());
+		verify(validationContext, never()).addError(anyString(), any(IErrorLocationType.class), any(IErrorCode.class), anyString());
 		verify(validationContext, never()).addErrorAtCurrentLocation(any(IErrorCode.class), anyString());
 	}
 
@@ -119,18 +137,24 @@ public class BeanValidationPreprocessorUnitTests {
 
 		final NotNullErrorCode notNullErrorCode = new NotNullErrorCode();
 		final LengthErrorCode lnErrorCode = new LengthErrorCode();
+		final JsonLocationType errorLocationType = new JsonLocationType(); 
 
-		processor.setConstraintCode(new IConstraintCode() {
+		processor.setConstraintConverter(new IConstraintConverter() {
 			@Override
 			public IErrorCode getErrorCode(Class<? extends Annotation> annotationType) {
-				final ConstraintCode code = annotationType.getAnnotation(ConstraintCode.class);
+				final ConstraintConverter converter = annotationType.getAnnotation(ConstraintConverter.class);
 
-				if (code.value() == 10) {
+				if (converter.code() == 10) {
 					return notNullErrorCode;
 				}
 				else {
 					return lnErrorCode;
 				}
+			}
+
+			@Override
+			public IErrorLocationType getErrorLocationType(Class<? extends Annotation> annotationType) {
+				return errorLocationType;
 			}
 		});
 		
@@ -138,13 +162,13 @@ public class BeanValidationPreprocessorUnitTests {
 		assertTrue(processor.process(user, config));
 
 		// ensure that all errors have been added at the correct location and with the correct code
-		verify(validationContext, times(1)).addError(eq("/name"), eq(notNullErrorCode), eq("This value must not be null."));
-		verify(validationContext, times(1)).addError(eq("/address/street"), eq(notNullErrorCode), eq("This value must not be null."));
-		verify(validationContext, times(1)).addError(eq("/applications/0/name"), eq(notNullErrorCode), eq("This value must not be null."));
-		verify(validationContext, times(1)).addError(eq("/applications/1/name"), eq(lnErrorCode), eq("This value must be at most 20 characters long."));
+		verify(validationContext, times(1)).addError(eq("/name"), eq(errorLocationType), eq(notNullErrorCode), eq("This value must not be null."));
+		verify(validationContext, times(1)).addError(eq("/address/street"), eq(errorLocationType), eq(notNullErrorCode), eq("This value must not be null."));
+		verify(validationContext, times(1)).addError(eq("/applications/0/name"), eq(errorLocationType), eq(notNullErrorCode), eq("This value must not be null."));
+		verify(validationContext, times(1)).addError(eq("/applications/1/name"), eq(errorLocationType), eq(lnErrorCode), eq("This value must be at most 20 characters long."));
 
 		// ensure that no other errors have been added
-		verify(validationContext, times(4)).addError(anyString(), any(IErrorCode.class), anyString());
+		verify(validationContext, times(4)).addError(anyString(), any(IErrorLocationType.class), any(IErrorCode.class), anyString());
 		verify(validationContext, never()).addErrorAtCurrentLocation(any(IErrorCode.class), anyString());
 	}
 
@@ -159,11 +183,17 @@ public class BeanValidationPreprocessorUnitTests {
 		patch.setAddress(new AddressTO()); // address is set with no street; street should be invalid
 
 		final NotNullErrorCode notNullErrorCode = new NotNullErrorCode();
+		final JsonLocationType errorLocationType = new JsonLocationType(); 
 
-		processor.setConstraintCode(new IConstraintCode() {
+		processor.setConstraintConverter(new IConstraintConverter() {
 			@Override
 			public IErrorCode getErrorCode(Class<? extends Annotation> annotationType) {
 				return notNullErrorCode;
+			}
+
+			@Override
+			public IErrorLocationType getErrorLocationType(Class<? extends Annotation> annotationType) {
+				return errorLocationType;
 			}
 		});
 
@@ -171,11 +201,11 @@ public class BeanValidationPreprocessorUnitTests {
 		assertTrue(processor.process(patch, config));
 
 		// ensure that an error was added for the middle name
-		verify(validationContext, times(1)).addError(eq("/middleName"), eq(notNullErrorCode), eq("This value must not be null."));
-		verify(validationContext, times(1)).addError(eq("/address/street"), eq(notNullErrorCode), eq("This value must not be null."));
+		verify(validationContext, times(1)).addError(eq("/middleName"), eq(errorLocationType), eq(notNullErrorCode), eq("This value must not be null."));
+		verify(validationContext, times(1)).addError(eq("/address/street"), eq(errorLocationType), eq(notNullErrorCode), eq("This value must not be null."));
 
 		// ensure that no other errors have been added
-		verify(validationContext, times(2)).addError(anyString(), any(IErrorCode.class), anyString());
+		verify(validationContext, times(2)).addError(anyString(), any(IErrorLocationType.class), any(IErrorCode.class), anyString());
 		verify(validationContext, never()).addErrorAtCurrentLocation(any(IErrorCode.class), anyString());
 	}
 
@@ -189,22 +219,28 @@ public class BeanValidationPreprocessorUnitTests {
 		// last name not set; should be validated because patch validation is not enabled
 
 		final NotNullErrorCode notNullErrorCode = new NotNullErrorCode();
+		final JsonLocationType errorLocationType = new JsonLocationType(); 
 		
-		processor.setConstraintCode(new IConstraintCode() {
+		processor.setConstraintConverter(new IConstraintConverter() {
 			@Override
 			public IErrorCode getErrorCode(Class<? extends Annotation> annotationType) {
 				return notNullErrorCode;
+			}
+
+			@Override
+			public IErrorLocationType getErrorLocationType(Class<? extends Annotation> annotationType) {
+				return errorLocationType;
 			}
 		});
 		
 		assertTrue(processor.process(patch, config));
 
 		// ensure that an error was added for the middle name
-		verify(validationContext, times(1)).addError(eq("/middleName"), eq(notNullErrorCode), eq("This value must not be null."));
-		verify(validationContext, times(1)).addError(eq("/lastName"), eq(notNullErrorCode), eq("This value must not be null."));
+		verify(validationContext, times(1)).addError(eq("/middleName"), eq(errorLocationType), eq(notNullErrorCode), eq("This value must not be null."));
+		verify(validationContext, times(1)).addError(eq("/lastName"), eq(errorLocationType), eq(notNullErrorCode), eq("This value must not be null."));
 
 		// ensure that no other errors have been added
-		verify(validationContext, times(2)).addError(anyString(), any(IErrorCode.class), anyString());
+		verify(validationContext, times(2)).addError(anyString(), any(IErrorLocationType.class), any(IErrorCode.class), anyString());
 		verify(validationContext, never()).addErrorAtCurrentLocation(any(IErrorCode.class), anyString());
 	}
 	
@@ -227,7 +263,7 @@ public class BeanValidationPreprocessorUnitTests {
 	@Target(ElementType.FIELD)
 	@Retention(RetentionPolicy.RUNTIME)
 	@Constraint(validatedBy = CheckNotNullTestValidator.class)
-	@ConstraintCode(10)
+	@ConstraintConverter(code = 10, locationType = "JSON")
 	public @interface CheckNotNullTest {
 
 		String message() default "This value must not be null.";
@@ -253,7 +289,7 @@ public class BeanValidationPreprocessorUnitTests {
 	@Target(ElementType.FIELD)
 	@Retention(RetentionPolicy.RUNTIME)
 	@Constraint(validatedBy = CheckStringLengthTestValidator.class)
-	@ConstraintCode(12)
+	@ConstraintConverter(code = 12, locationType = "json")
 	public @interface CheckStringLengthTest {
 
 		int max();
@@ -437,5 +473,15 @@ public class BeanValidationPreprocessorUnitTests {
 		public int getDefaultHttpStatusCode() {
 			return 422;
 		}
-	}	//</editor-fold>
+	}
+	
+	public static class JsonLocationType implements IErrorLocationType {
+	
+		@Override
+		public String getLocationType() {
+			return "json"; //To change body of generated methods, choose Tools | Templates.
+		}
+	}
+	//</editor-fold>
+
 }

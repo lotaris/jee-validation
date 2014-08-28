@@ -37,14 +37,14 @@ public class JsonValidationContext implements IValidationContext {
 	}
 
 	@Override
-	public IValidationContext addError(String location, IErrorCode code, String message, Object... messageArgs) {
-		collector.addError(new ApiErrorTO(String.format(message, messageArgs), location(location), code));
+	public IValidationContext addError(String location, IErrorLocationType type, IErrorCode code, String message, Object... messageArgs) {
+		collector.addError(new ApiError(String.format(message, messageArgs), code, type, location(location)));
 		return this;
 	}
 
 	@Override
 	public IValidationContext addErrorAtCurrentLocation(IErrorCode code, String message, Object... messageArgs) {
-		return addError("", code, message, messageArgs);
+		return addError("", JSON_LOCATION_TYPE, code, message, messageArgs);
 	}
 
 	@Override
@@ -114,4 +114,13 @@ public class JsonValidationContext implements IValidationContext {
 			return validateObjects(singleObjectOrList.getList(), relativeLocation, validator);
 		}
 	}
+	
+	private static final IErrorLocationType JSON_LOCATION_TYPE = new IErrorLocationType() {
+		
+		@Override
+		public String getLocationType() {
+			return "json";
+		}
+	;
+};	
 }

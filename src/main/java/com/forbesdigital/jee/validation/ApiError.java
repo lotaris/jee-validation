@@ -15,29 +15,37 @@ import org.codehaus.jackson.annotate.JsonProperty;
  *
  * @author Simon Oulevay (simon.oulevay@lotaris.com)
  */
-public class ApiErrorTO implements IError {
+public class ApiError implements IError {
 
 	private String message;
-	private String location;
 	@JsonIgnore
 	private IErrorCode code;
+	@JsonIgnore
+	private IErrorLocationType locationType;
+	private String location;
 
 	//<editor-fold defaultstate="collapsed" desc="Constructors">
-	public ApiErrorTO(String message, IErrorCode code) {
+	public ApiError(String message, IErrorCode code) {
 		this.message = message;
 		this.code = code;
 	}
 
-	public ApiErrorTO(String message, String location, IErrorCode code) {
+	public ApiError(String message, IErrorCode code, IErrorLocationType locationType, String location) {
 		this.message = message;
-		this.location = location;
 		this.code = code;
+		this.locationType = locationType;
+		this.location = location;
 	}
 	//</editor-fold>
 
 	@JsonProperty("code")
 	public Integer getNumericCode() {
 		return code != null ? code.getCode() : null;
+	}
+
+	@JsonProperty("locationType")
+	public String getLocationTypeAsString() {
+		return locationType != null ? locationType.getLocationType(): null;
 	}
 
 	//<editor-fold defaultstate="collapsed" desc="Getters & Setters">
@@ -57,6 +65,15 @@ public class ApiErrorTO implements IError {
 
 	public void setCode(IErrorCode code) {
 		this.code = code;
+	}
+
+	@Override
+	public IErrorLocationType getLocationType() {
+		return locationType;
+	}
+
+	public void setLocationType(IErrorLocationType locationType) {
+		this.locationType = locationType;
 	}
 
 	@Override

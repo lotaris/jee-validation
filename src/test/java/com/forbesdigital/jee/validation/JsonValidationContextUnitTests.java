@@ -30,6 +30,7 @@ public class JsonValidationContextUnitTests {
 	@InjectMocks
 	private JsonValidationContext context;
 	private Integer lastCode;
+	private String lastLocationType;
 
 	@Before
 	public void setUp() {
@@ -44,11 +45,11 @@ public class JsonValidationContextUnitTests {
 	@RoxableTest(key = "172a761588ae")
 	public void validationContextShouldForwardAddErrorsToItsErrorCollector() {
 
-		assertSame(context, context.addError("/foo", code(), "foo"));
-		verify(collector).addError(argThat(isAnErrorWith("foo", "/foo", lastCode)));
+		assertSame(context, context.addError("/foo", locationType(), code(), "foo"));
+		verify(collector).addError(argThat(isAnErrorWith("foo", "/foo", lastLocationType, lastCode)));
 
-		assertSame(context, context.addError("/bar", code(), "bar"));
-		verify(collector).addError(argThat(isAnErrorWith("bar", "/bar", lastCode)));
+		assertSame(context, context.addError("/bar", locationType(), code(), "bar"));
+		verify(collector).addError(argThat(isAnErrorWith("bar", "/bar", lastLocationType, lastCode)));
 	}
 
 	@Test
@@ -56,15 +57,15 @@ public class JsonValidationContextUnitTests {
 	public void validationContextShouldForwardAddErrorsAtTheCurrentLocationToItsErrorCollector() {
 
 		assertSame(context, context.addErrorAtCurrentLocation(code(), "foo"));
-		verify(collector).addError(argThat(isAnErrorWith("foo", "", lastCode)));
+		verify(collector).addError(argThat(isAnErrorWith("foo", "", "json", lastCode)));
 	}
 
 	@Test
 	@RoxableTest(key = "32dea4c8942d")
 	public void validationContextShouldFormatErrorMessagesWithArguments() {
 
-		assertSame(context, context.addError("/foo", code(), "This message has arguments %s, %s and %s.", "a", "b", "c"));
-		verify(collector).addError(argThat(isAnErrorWith("This message has arguments a, b and c.", "/foo", lastCode)));
+		assertSame(context, context.addError("/foo", locationType(), code(), "This message has arguments %s, %s and %s.", "a", "b", "c"));
+		verify(collector).addError(argThat(isAnErrorWith("This message has arguments a, b and c.", "/foo", lastLocationType, lastCode)));
 	}
 
 	@Test
@@ -72,7 +73,7 @@ public class JsonValidationContextUnitTests {
 	public void validationContextShouldFormatErrorMessagesWithArgumentsAtCurrentLocation() {
 
 		assertSame(context, context.addErrorAtCurrentLocation(code(), "This message has arguments %s, %s and %s.", "a", "b", "c"));
-		verify(collector).addError(argThat(isAnErrorWith("This message has arguments a, b and c.", "", lastCode)));
+		verify(collector).addError(argThat(isAnErrorWith("This message has arguments a, b and c.", "", "json", lastCode)));
 	}
 
 	@Test
@@ -146,16 +147,16 @@ public class JsonValidationContextUnitTests {
 				assertEquals("/foo", context.location(""));
 				assertEquals("/foo/bar", context.location("/bar"));
 
-				context.addError("/bar", code(24), "broken");
-				context.addError("/bar/baz", code(42), "also broken");
+				context.addError("/bar", locationType("locationType1"), code(24), "broken");
+				context.addError("/bar/baz", locationType("locationType2"), code(42), "also broken");
 			}
 		};
 
 		context.validateObject("yeehaw", "/foo", validator);
 
 		final InOrder inOrder = inOrder(collector);
-		inOrder.verify(collector).addError(argThat(isAnErrorWith("broken", "/foo/bar", 24)));
-		inOrder.verify(collector).addError(argThat(isAnErrorWith("also broken", "/foo/bar/baz", 42)));
+		inOrder.verify(collector).addError(argThat(isAnErrorWith("broken", "/foo/bar", "locationType1", 24)));
+		inOrder.verify(collector).addError(argThat(isAnErrorWith("also broken", "/foo/bar/baz", "locationType2", 42)));
 	}
 
 	@Test
@@ -170,7 +171,7 @@ public class JsonValidationContextUnitTests {
 				assertThat(context.location(""), matches("^\\/foo\\/\\d$"));
 				assertThat(context.location("/sub"), matches("^\\/foo\\/\\d\\/sub$"));
 
-				context.addError("/name", code(22), "broken");
+				context.addError("/name", locationType("locationType1"), code(22), "broken");
 			}
 		};
 
@@ -178,9 +179,9 @@ public class JsonValidationContextUnitTests {
 		context.validateObjects(strings, "foo", validator);
 
 		final InOrder inOrder = inOrder(collector);
-		inOrder.verify(collector).addError(argThat(isAnErrorWith("broken", "/foo/0/name", 22)));
-		inOrder.verify(collector).addError(argThat(isAnErrorWith("broken", "/foo/1/name", 22)));
-		inOrder.verify(collector).addError(argThat(isAnErrorWith("broken", "/foo/2/name", 22)));
+		inOrder.verify(collector).addError(argThat(isAnErrorWith("broken", "/foo/0/name", "locationType1", 22)));
+		inOrder.verify(collector).addError(argThat(isAnErrorWith("broken", "/foo/1/name", "locationType1", 22)));
+		inOrder.verify(collector).addError(argThat(isAnErrorWith("broken", "/foo/2/name", "locationType1", 22)));
 		verify(collector, times(3)).addError(any(IError.class));
 	}
 
@@ -196,7 +197,7 @@ public class JsonValidationContextUnitTests {
 				assertThat(context.location(""), matches("^\\/foo\\/bar\\/baz\\/\\d$"));
 				assertThat(context.location("/sub"), matches("^\\/foo\\/bar\\/baz\\/\\d\\/sub$"));
 
-				context.addError("/last", code(22), "definitely broken");
+				context.addError("/last", locationType("locationType3"), code(22), "definitely broken");
 			}
 		};
 
@@ -208,8 +209,8 @@ public class JsonValidationContextUnitTests {
 				assertEquals("/foo/bar", context.location(""));
 				assertEquals("/foo/bar/sub", context.location("/sub"));
 
-				context.addError("/name", null, "also broken");
-				context.addErrorAtCurrentLocation(null, "still broken");
+				context.addError("/name", locationType("locationType1"), null, "also broken");
+				context.addErrorAtCurrentLocation( null, "still broken");
 
 				final List<String> objects = Arrays.asList("baz1", "baz2", "baz3");
 				context.validateObjects(objects, "/baz", thirdLevelValidator);
@@ -224,22 +225,22 @@ public class JsonValidationContextUnitTests {
 				assertEquals("/foo", context.location(""));
 				assertEquals("/foo/sub", context.location("/sub"));
 
-				context.addError(null, code(66), "broken");
+				context.addError(null, null, code(66), "broken");
 				context.validateObject("bar", "/bar", secondLevelValidator);
 			}
 		};
 
-		context.addError("", null, "fubar");
+		context.addError("", locationType("locationType0"), null, "fubar");
 		context.validateObject("foo", "/foo", firstLevelValidator);
 
 		final InOrder inOrder = inOrder(collector);
-		inOrder.verify(collector).addError(argThat(isAnErrorWith("fubar", "", null)));
-		inOrder.verify(collector).addError(argThat(isAnErrorWith("broken", null, 66)));
-		inOrder.verify(collector).addError(argThat(isAnErrorWith("also broken", "/foo/bar/name", null)));
-		inOrder.verify(collector).addError(argThat(isAnErrorWith("still broken", "/foo/bar", null)));
-		inOrder.verify(collector).addError(argThat(isAnErrorWith("definitely broken", "/foo/bar/baz/0/last", 22)));
-		inOrder.verify(collector).addError(argThat(isAnErrorWith("definitely broken", "/foo/bar/baz/1/last", 22)));
-		inOrder.verify(collector).addError(argThat(isAnErrorWith("definitely broken", "/foo/bar/baz/2/last", 22)));
+		inOrder.verify(collector).addError(argThat(isAnErrorWith("fubar", "", "locationType0",null)));
+		inOrder.verify(collector).addError(argThat(isAnErrorWith("broken", null, null, 66)));
+		inOrder.verify(collector).addError(argThat(isAnErrorWith("also broken", "/foo/bar/name", "locationType1", null)));
+		inOrder.verify(collector).addError(argThat(isAnErrorWith("still broken", "/foo/bar", "json", null)));
+		inOrder.verify(collector).addError(argThat(isAnErrorWith("definitely broken", "/foo/bar/baz/0/last", "locationType3", 22)));
+		inOrder.verify(collector).addError(argThat(isAnErrorWith("definitely broken", "/foo/bar/baz/1/last", "locationType3", 22)));
+		inOrder.verify(collector).addError(argThat(isAnErrorWith("definitely broken", "/foo/bar/baz/2/last", "locationType3", 22)));
 		verify(collector, times(7)).addError(any(IError.class));
 	}
 
@@ -255,12 +256,12 @@ public class JsonValidationContextUnitTests {
 				assertEquals("", context.location(""));
 				assertEquals("/sub", context.location("/sub"));
 
-				context.addError("/name", code(66), "broken");
+				context.addError("/name", locationType("locationType1"), code(66), "broken");
 			}
 		};
 
 		context.validateObject("foo", null, validator);
-		verify(collector).addError(argThat(isAnErrorWith("broken", "/name", 66)));
+		verify(collector).addError(argThat(isAnErrorWith("broken", "/name", "locationType1", 66)));
 	}
 
 	@Test
@@ -275,7 +276,7 @@ public class JsonValidationContextUnitTests {
 				assertThat(context.location(""), matches("^\\/\\d$"));
 				assertThat(context.location("/sub"), matches("^\\/\\d\\/sub$"));
 
-				context.addError("/name", code(66), "broken");
+				context.addError("/name", locationType("locationType1"), code(66), "broken");
 			}
 		};
 
@@ -283,9 +284,9 @@ public class JsonValidationContextUnitTests {
 		context.validateObjects(strings, null, validator);
 
 		final InOrder inOrder = inOrder(collector);
-		inOrder.verify(collector).addError(argThat(isAnErrorWith("broken", "/0/name", 66)));
-		inOrder.verify(collector).addError(argThat(isAnErrorWith("broken", "/1/name", 66)));
-		inOrder.verify(collector).addError(argThat(isAnErrorWith("broken", "/2/name", 66)));
+		inOrder.verify(collector).addError(argThat(isAnErrorWith("broken", "/0/name", "locationType1", 66)));
+		inOrder.verify(collector).addError(argThat(isAnErrorWith("broken", "/1/name", "locationType1", 66)));
+		inOrder.verify(collector).addError(argThat(isAnErrorWith("broken", "/2/name", "locationType1", 66)));
 		verify(collector, times(3)).addError(any(IError.class));
 	}
 
@@ -307,6 +308,21 @@ public class JsonValidationContextUnitTests {
 		};
 	}
 
+	private IErrorLocationType locationType() {
+		return locationType(lastLocationType = "locationType" + RANDOM.nextInt());
+	}
+	
+	private static IErrorLocationType locationType(final String locationType) {
+		return new IErrorLocationType() {
+
+			@Override
+			public String getLocationType() {
+				return locationType;
+			}
+
+		};
+	}
+	
 	private static BaseMatcher<String> matches(final String pattern) {
 		return new BaseMatcher<String>() {
 			@Override
@@ -335,7 +351,7 @@ public class JsonValidationContextUnitTests {
 		};
 	}
 
-	private static BaseMatcher<IError> isAnErrorWith(final String message, final String location, final Integer code) {
+	private static BaseMatcher<IError> isAnErrorWith(final String message, final String location, final String locationType, final Integer code) {
 		return new BaseMatcher<IError>() {
 			@Override
 			public boolean matches(Object item) {
@@ -348,6 +364,7 @@ public class JsonValidationContextUnitTests {
 
 				return message.equals(error.getMessage())
 						&& (location != null ? location.equals(error.getLocation()) : error.getLocation() == null)
+						&& (locationType != null ? error.getLocationType() != null && locationType.equals(error.getLocationType().getLocationType()) : error.getLocationType() == null)
 						&& (code != null ? error.getCode() != null && code.equals(error.getCode().getCode()) : error.getCode() == null);
 			}
 
@@ -355,6 +372,7 @@ public class JsonValidationContextUnitTests {
 			public void describeTo(Description description) {
 				description.appendText(IError.class.getSimpleName() + " with message \"" + message + "\""
 						+ " and location \"" + location + "\""
+						+ " and locationType \"" + locationType + "\""
 						+ " and code " + code);
 			}
 		};

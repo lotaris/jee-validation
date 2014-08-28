@@ -14,6 +14,10 @@ public interface IErrorCode {
 	 */
 	int getCode();
 	
-	// TODO: Comment
+	/**
+	 * Returns the default http status code of the error.
+	 *
+	 * @return an integer http status code
+	 */
 	int getDefaultHttpStatusCode();
 }

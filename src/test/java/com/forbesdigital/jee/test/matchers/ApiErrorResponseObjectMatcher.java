@@ -1,7 +1,7 @@
 package com.forbesdigital.jee.test.matchers;
 
-import com.forbesdigital.jee.validation.ApiErrorResponseTO;
-import com.forbesdigital.jee.validation.ApiErrorTO;
+import com.forbesdigital.jee.validation.ApiErrorResponse;
+import com.forbesdigital.jee.validation.ApiError;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -13,7 +13,7 @@ import org.hamcrest.Description;
  *
  * @author Simon Oulevay <simon.oulevay@lotaris.com>
  */
-public class ApiErrorResponseObjectMatcher extends BaseMatcher<ApiErrorResponseTO> {
+public class ApiErrorResponseObjectMatcher extends BaseMatcher<ApiErrorResponse> {
 
 	//<editor-fold defaultstate="collapsed" desc="Static Imports">
 	public static ApiErrorResponseObjectMatcher isApiErrorResponseObject() {
@@ -77,14 +77,14 @@ public class ApiErrorResponseObjectMatcher extends BaseMatcher<ApiErrorResponseT
 			return false;
 		}
 
-		final ApiErrorResponseTO response = (ApiErrorResponseTO) item;
+		final ApiErrorResponse response = (ApiErrorResponse) item;
 
 		// ensure the HTTP status code is the correct one (if set)
 		actualHttpStatusCode = response.getHttpStatusCode();
 		httpStatusCodeMatches = expectedHttpStatusCode == null || expectedHttpStatusCode.equals(actualHttpStatusCode);
 
-		for (ApiErrorTO errorTransferObject : response.getErrors()) {
-			actualErrors.add(new Error(errorTransferObject));
+		for (ApiError error : response.getErrors()) {
+			actualErrors.add(new Error(error));
 		}
 
 		// ensure all expected errors are there
@@ -155,10 +155,10 @@ public class ApiErrorResponseObjectMatcher extends BaseMatcher<ApiErrorResponseT
 		private String location;
 		private String message;
 
-		public Error(ApiErrorTO transferObject) {
-			this.code = transferObject.getNumericCode();
-			this.location = transferObject.getLocation();
-			this.message = transferObject.getMessage();
+		public Error(ApiError error) {
+			this.code = error.getNumericCode();
+			this.location = error.getLocation();
+			this.message = error.getMessage();
 		}
 
 		public Integer getCode() {

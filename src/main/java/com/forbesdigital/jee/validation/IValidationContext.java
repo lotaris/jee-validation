@@ -29,13 +29,14 @@ public interface IValidationContext {
 	 *
 	 * @param location a JSON Pointer (see http://tools.ietf.org/html/rfc6901) indicating which
 	 * value of the JSON document is invalid (relative to the current location)
+	 * @param type the type of the error
 	 * @param code the code identifying the error type (e.g. invalid string length)
 	 * @param message the error message
 	 * @param messageArgs optional arguments to be interpolated into the message (see
 	 * {@link String#format(java.lang.String, java.lang.Object[])})
 	 * @return this context
 	 */
-	IValidationContext addError(String location, IErrorCode code, String message, Object... messageArgs);
+	IValidationContext addError(String location, IErrorLocationType type, IErrorCode code, String message, Object... messageArgs);
 
 	/**
 	 * Adds an error at the current location. Check previously added errors with <tt>hasErrors</tt>.
