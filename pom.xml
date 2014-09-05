@@ -5,7 +5,7 @@
   <groupId>com.forbesdigital.jee</groupId>
   <artifactId>validation</artifactId>
   <name>FD JEE Validation</name>
-  <version>0.2.0-SNAPSHOT</version>
+  <version>0.1.1</version>
   <packaging>jar</packaging>
 
   <properties>
@@ -100,7 +100,6 @@
 					<configuration>
 						<miniRoxListenerClass>com.lotaris.minirox.client.junit.MiniRoxListener</miniRoxListenerClass>
 						<miniRoxFilterClass>com.lotaris.minirox.client.MiniRoxFilter</miniRoxFilterClass>
-						<roxConfig>${project.basedir}/target/classes/rox.yml</roxConfig>
 					</configuration>
 					<dependencies>
 						<dependency>
@@ -148,13 +147,6 @@
 
 		<resources>
 			<resource>
-				<directory>src/main/resources</directory>
-				<includes>
-					<include>rox.yml</include>
-				</includes>
-			</resource>
-
-			<resource>
 				<directory>src/main/resources/META-INF</directory>
 				<targetPath>META-INF</targetPath>
 				<includes>
@@ -169,6 +161,7 @@
 				<filtering>true</filtering>
 				<includes>
 					<include>junitee.properties</include>
+					<include>rox.yml</include>
 				</includes>
 			</testResource>
 		</testResources>
