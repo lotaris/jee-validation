@@ -225,7 +225,17 @@ public class ApiPreprocessingContextUnitTests {
 
 		try {
 			context.getValidationContext().getState(Object.class);
+			fail("Expected IllegalArgumentException to be thrown when getting an unregistered state");
+		} catch (IllegalArgumentException iae) {
+		}
+
+		try {
 			context.getValidationContext().getState(ArrayList.class);
+			fail("Expected IllegalArgumentException to be thrown when getting an unregistered state");
+		} catch (IllegalArgumentException iae) {
+		}
+
+		try {
 			context.getValidationContext().getState(Map.class);
 			fail("Expected IllegalArgumentException to be thrown when getting an unregistered state");
 		} catch (IllegalArgumentException iae) {
