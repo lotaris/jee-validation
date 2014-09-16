@@ -22,6 +22,10 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import static com.forbesdigital.jee.test.matchers.Matchers.*;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @see ApiPreprocessingContext
  * @author Simon Oulevay (simon.oulevay@lotaris.com)
@@ -213,6 +217,39 @@ public class ApiPreprocessingContextUnitTests {
 		assertThat(result, isSuccessfulPreprocessingResult(true));
 		assertFalse("Preprocessing result should indicate that no errors were collected", result.hasErrors());
 		assertThat(result.getApiErrorResponse(), isApiErrorResponseObject(422));
+	}
+
+	@Test
+	@RoxableTest(key = "311f9c8c7f61")
+	public void apiPreprocessingContextShouldAddStateObjectsToTheValidationContext() {
+
+		try {
+			context.getValidationContext().getState(Object.class);
+			fail("Expected IllegalArgumentException to be thrown when getting an unregistered state");
+		} catch (IllegalArgumentException iae) {
+		}
+
+		try {
+			context.getValidationContext().getState(ArrayList.class);
+			fail("Expected IllegalArgumentException to be thrown when getting an unregistered state");
+		} catch (IllegalArgumentException iae) {
+		}
+
+		try {
+			context.getValidationContext().getState(Map.class);
+			fail("Expected IllegalArgumentException to be thrown when getting an unregistered state");
+		} catch (IllegalArgumentException iae) {
+		}
+
+		final Object state1 = new Object();
+		context.withState(state1, Object.class);
+		assertSame(state1, context.getValidationContext().getState(Object.class));
+
+		final List state2 = new ArrayList();
+		final Map state3 = new HashMap();
+		context.withStates(state2, state3);
+		assertSame(state2, context.getValidationContext().getState(ArrayList.class));
+		assertSame(state3, context.getValidationContext().getState(HashMap.class));
 	}
 
 	private IErrorCode errorCode(final int code) {

@@ -160,4 +160,19 @@ public interface IValidationContext {
 	 * @return this context
 	 */
 	<T> IValidationContext validateObjectOrList(SingleObjectOrList<T> singleObjectOrList, String relativeLocation, IValidator<T> validator);
+
+	/**
+	 * Returns the state object of the specified class. State objects may be used by validation
+	 * context implementations to allow validators to share data amongst themselves and with the
+	 * caller.
+	 *
+	 * <p>This method guarantees that a state object will be returned or a runtime exception will be
+	 * thrown.
+	 *
+	 * @param <T> the type of state object
+	 * @param stateClass the class identifying the state object
+	 * @return a state object
+	 * @throws IllegalArgumentException if no state object was registered for that class
+	 */
+	<T> T getState(Class<? extends T> stateClass) throws IllegalArgumentException;
 }

@@ -17,6 +17,10 @@ import org.mockito.MockitoAnnotations;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+
 /**
  * @see JsonValidationContext
  * @author Simon Oulevay (simon.oulevay@lotaris.com)
@@ -288,6 +292,76 @@ public class JsonValidationContextUnitTests {
 		inOrder.verify(collector).addError(argThat(isAnErrorWith("broken", "/1/name", "locationType1", 66)));
 		inOrder.verify(collector).addError(argThat(isAnErrorWith("broken", "/2/name", "locationType1", 66)));
 		verify(collector, times(3)).addError(any(IError.class));
+	}
+
+	@Test
+	@RoxableTest(key = "956febe33898")
+	public void apiPreprocessingContextShouldRegisterOneStateObjectByClass() {
+
+		final Object state = new Object();
+
+		final IValidationContext result = context.addState(state, Object.class);
+		assertSame(context, result);
+		assertSame(state, context.getState(Object.class));
+	}
+
+	@Test
+	@RoxableTest(key = "8162ed31c1c8")
+	public void apiPreprocessingContextShouldRegisterOneSubclassedStateObjectByClass() {
+
+		final ArrayList state = new ArrayList();
+
+		final IValidationContext result = context.addState(state, Collection.class);
+		assertSame(context, result);
+		assertSame(state, context.getState(ArrayList.class));
+	}
+
+	@Test
+	@RoxableTest(key = "5d12f39e8861")
+	public void apiPreprocessingContextShouldRegisterManyStateObjects() {
+
+		final ArrayList state1 = new ArrayList();
+		final HashMap state2 = new HashMap();
+
+		final IValidationContext result = context.addStates(state1, state2);
+		assertSame(context, result);
+		assertSame(state1, context.getState(ArrayList.class));
+		assertSame(state2, context.getState(HashMap.class));
+	}
+
+	@Test
+	@RoxableTest(key = "14c0109cd96e")
+	public void apiPreprocessingContextShouldThrowIllegalArgumentExceptionForUnregisteredStates() {
+		try {
+			context.getState(Object.class);
+			fail("Expected IllegalArgumentException to be thrown when getting an unregistered state");
+		} catch (IllegalArgumentException iae) {
+			assertEquals("No state object registered for class " + Object.class.getName(), iae.getMessage());
+		}
+	}
+
+	@Test
+	@RoxableTest(key = "a07e9f77defd")
+	public void apiPreprocessingContextShouldThrowIllegalArgumentExceptionForAlreadyRegisteredStates() {
+
+		final Object state = new Object();
+		context.addState(state, Object.class);
+
+		try {
+			context.addState(new Object(), Object.class);
+			fail("Expected IllegalArgumentException to be thrown when registering an already existing state");
+		} catch (IllegalArgumentException iae) {
+			assertEquals("A state object is already registered for class " + Object.class.getName(), iae.getMessage());
+		}
+
+		try {
+			context.addStates(new ArrayList(), new Object());
+			fail("Expected IllegalArgumentException to be thrown when registering an already existing state");
+		} catch (IllegalArgumentException iae) {
+			assertEquals("A state object is already registered for class " + Object.class.getName(), iae.getMessage());
+		}
+
+		assertSame(state, context.getState(Object.class));
 	}
 
 	private IErrorCode code() {

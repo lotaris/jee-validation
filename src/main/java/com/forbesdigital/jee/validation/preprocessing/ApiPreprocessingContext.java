@@ -42,7 +42,7 @@ public class ApiPreprocessingContext implements IPreprocessingConfig {
 	
 	private IPreprocessor preprocessor;
 	private ApiErrorResponse apiErrorResponse;
-	private IValidationContext validationContext;
+	private JsonValidationContext validationContext;
 	private Class[] validationGroups;
 	private List<IValidator> validators;
 	private boolean failOnErrors;
@@ -153,6 +153,38 @@ public class ApiPreprocessingContext implements IPreprocessingConfig {
 	@Override
 	public boolean isPatchValidationEnabled() {
 		return patchValidation;
+	}
+
+	/**
+	 * Adds the specified state object to the validation context. It can be retrieved by passing
+	 * the identifying class to {@link #getState(java.lang.Class)}.
+	 *
+	 * @param <T> the type of state
+	 * @param state the state object
+	 * @param stateClass the class identifying the state
+	 * @return this context
+	 * @throws IllegalArgumentException if a state is already registered for that class
+	 */
+	public <T> ApiPreprocessingContext withState(T state, Class<? extends T> stateClass) {
+		validationContext.addState(state, stateClass);
+		return this;
+	}
+
+	/**
+	 * Adds the specified state objects to the validation context. Each state object will be
+	 * identified by its concrete class (retrieved with <tt>getClass</tt>) and can be retrieved
+	 * with {@link #getState(java.lang.Class)}.
+	 * 
+	 * <p>State objects can be used to share data between validators and with the caller.
+	 *
+	 * @param states the state objects to register
+	 * @return this context
+	 * @throws IllegalArgumentException if a state is already registered for a class of one of the
+	 * specified states (or there are duplicates)
+	 */
+	public ApiPreprocessingContext withStates(Object ... states) throws IllegalArgumentException {
+		validationContext.addStates(states);
+		return this;
 	}
 
 	/**

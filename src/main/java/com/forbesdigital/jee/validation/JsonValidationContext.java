@@ -1,6 +1,8 @@
 package com.forbesdigital.jee.validation;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Control object responsible for keeping track of errors and their location during validation.
@@ -30,10 +32,20 @@ public class JsonValidationContext implements IValidationContext {
 	 * @see http://tools.ietf.org/html/rfc6901
 	 */
 	private JsonPointer currentLocation;
+	/**
+	 * State objects to share between validators and with the caller.
+	 */
+	private Map<Class, Object> states;
 
+	/**
+	 * Constructs a new context.
+	 *
+	 * @param collector the object into which to collect errors
+	 */
 	public JsonValidationContext(IErrorCollector collector) {
 		this.collector = collector;
 		this.currentLocation = new JsonPointer();
+		this.states = new HashMap<>();
 	}
 
 	@Override
@@ -114,13 +126,62 @@ public class JsonValidationContext implements IValidationContext {
 			return validateObjects(singleObjectOrList.getList(), relativeLocation, validator);
 		}
 	}
-	
+
+	/**
+	 * Adds the specified state object to this validation context. It can be retrieved by passing
+	 * the identifying class to {@link #getState(java.lang.Class)}.
+	 *
+	 * @param <T> the type of state
+	 * @param state the state object to register
+	 * @param stateClass the class identifying the state
+	 * @return this context
+	 * @throws IllegalArgumentException if a state is already registered for that class
+	 */
+	public <T> JsonValidationContext addState(T state, Class<? extends T> stateClass) throws IllegalArgumentException {
+
+		// only accept one state of each class
+		if (this.states.containsKey(state.getClass())) {
+			throw new IllegalArgumentException("A state object is already registered for class " + state.getClass().getName());
+		}
+
+		this.states.put(state.getClass(), state);
+
+		return this;
+	}
+
+	/**
+	 * Adds the specified state objects to this validation context. Each state object will be
+	 * identified by its concrete class (retrieved with <tt>getClass</tt>) and can be retrieved with
+	 * {@link #getState(java.lang.Class)}.
+	 *
+	 * @param states the state objects to register
+	 * @return this context
+	 * @throws IllegalArgumentException if a state is already registered for a class of one of the
+	 * specified states (or there are duplicates)
+	 */
+	public JsonValidationContext addStates(Object... states) throws IllegalArgumentException {
+
+		for (Object state : states) {
+			addState(state, state.getClass());
+		}
+
+		return this;
+	}
+
+	@Override
+	public <T> T getState(Class<? extends T> stateClass) throws IllegalArgumentException {
+
+		final Object state = states.get(stateClass);
+		if (state == null) {
+			throw new IllegalArgumentException("No state object registered for class " + stateClass.getName());
+		}
+
+		return (T) state;
+	}
 	private static final IErrorLocationType JSON_LOCATION_TYPE = new IErrorLocationType() {
-		
 		@Override
 		public String getLocationType() {
 			return "json";
 		}
-	;
-};	
+	};
 }
