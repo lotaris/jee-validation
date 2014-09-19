@@ -328,3 +328,5 @@ On how to implement a Bean Validator and a Modifier, check out the
 [IPatchObject]: src/main/java/com/forbesdigital/jee/validation/IPatchObject.java
 [AbstractPatchTransferObject]: src/main/java/com/forbesdigital/jee/validation/AbstractPatchTransferObject.java
 [confluence-howto-write]: https://lotaris.atlassian.net/wiki/display/DC/REST+API+Validations
+[lprevost]: /users/lprevost
+[soulevay]: /users/soulevay
