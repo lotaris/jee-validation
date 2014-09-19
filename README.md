@@ -220,8 +220,10 @@ public class UserResource extends AbstractResource {
 ```
 
 If any component of the pre-processing chain produced an error, the `process()`
-method throws an `ApiErrorsException` and the error will be delivered directly
-to the client, halting any further processing at that point.
+method throws an `ApiErrorsException`. Using an exception mapper such as [the 
+one from REST Library][exception-mapper], the error will be serialized to the 
+client. Due to the nature of the exception, processing at that point will
+be halted.
 
 
 ## Output
@@ -328,5 +330,6 @@ On how to implement a Bean Validator and a Modifier, check out the
 [IPatchObject]: src/main/java/com/forbesdigital/jee/validation/IPatchObject.java
 [AbstractPatchTransferObject]: src/main/java/com/forbesdigital/jee/validation/AbstractPatchTransferObject.java
 [confluence-howto-write]: https://lotaris.atlassian.net/wiki/display/DC/REST+API+Validations
+[exception-mapper]: /projects/LIB/repos/fd-jee-rest/browse/src/main/java/com/forbesdigital/jee/rest/mappers/ApiErrorsExceptionMapper.java
 [lprevost]: /users/lprevost
 [soulevay]: /users/soulevay
