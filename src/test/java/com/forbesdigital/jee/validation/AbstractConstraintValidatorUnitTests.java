@@ -38,6 +38,7 @@ public class AbstractConstraintValidatorUnitTests {
 		when(beanValidationContext.buildConstraintViolationWithTemplate(anyString())).thenReturn(constraintViolationBuilder);
 		when(constraintViolationBuilder.addConstraintViolation()).thenReturn(beanValidationContext);
 		when(constraintViolationBuilder.addPropertyNode(anyString())).thenReturn(nodeBuilderCustomizableContext);
+		when(nodeBuilderCustomizableContext.addPropertyNode(anyString())).thenReturn(nodeBuilderCustomizableContext);
 		when(nodeBuilderCustomizableContext.addConstraintViolation()).thenReturn(beanValidationContext);
 	}
 
@@ -175,6 +176,7 @@ public class AbstractConstraintValidatorUnitTests {
 				public void validate(Object value, IConstraintValidationContext context) {
 					context.addErrorAtCurrentLocation("foo");
 					context.addError("property", "foo");
+					context.addArrayError("arrayProperty", 42, "foo");
 					context.addDefaultError();
 				}
 			}.isValid(new Object(), beanValidationContext);
@@ -183,7 +185,7 @@ public class AbstractConstraintValidatorUnitTests {
 		}
 
 		verify(constraintViolationBuilder, times(2)).addConstraintViolation();
-		verify(nodeBuilderCustomizableContext).addConstraintViolation();
+		verify(nodeBuilderCustomizableContext, times(2)).addConstraintViolation();
 	}
 
 	@Test
@@ -195,6 +197,7 @@ public class AbstractConstraintValidatorUnitTests {
 				@Override
 				public void validate(Object value, IConstraintValidationContext context) {
 					context.addError(".dotted.property", "foo");
+					context.addArrayError(".dotted.arrayProperty", 42, "foo");
 				}
 			}.isValid(new Object(), beanValidationContext);
 			fail("Expected an invalid argument exception to be thrown");
@@ -207,6 +210,7 @@ public class AbstractConstraintValidatorUnitTests {
 				@Override
 				public void validate(Object value, IConstraintValidationContext context) {
 					context.addError("/sub/path", "foo");
+					context.addArrayError("/sub/arrayProperty", 42, "foo");
 				}
 			}.isValid(new Object(), beanValidationContext);
 			fail("Expected an invalid argument exception to be thrown");

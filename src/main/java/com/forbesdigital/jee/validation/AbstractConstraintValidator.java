@@ -151,16 +151,15 @@ public abstract class AbstractConstraintValidator<A extends Annotation, T> imple
 
 		@Override
 		public IConstraintValidationContext addError(String location, String message, Object... messageArgs) {
-			if (location.contains(".")) {
-				throw new IllegalArgumentException("Constraint violation error locations cannot contain dots.");
-			}
-
-			location = location.replaceFirst("^\\/", "");
-			if (location.contains("/")) {
-				throw new IllegalArgumentException("Constraint violation error locations cannot contain a slash except as the first character.");
-			}
-
+			location = validateLocation(location);
 			addErrors().buildConstraintViolationWithTemplate(String.format(message, messageArgs)).addPropertyNode(location).addConstraintViolation();
+			return this;
+		}
+		
+		@Override
+		public IConstraintValidationContext addArrayError(String location, int index, String message, Object... messageArgs) {
+			location = validateLocation(location);
+			addErrors().buildConstraintViolationWithTemplate(String.format(message, messageArgs)).addPropertyNode(location).addPropertyNode(String.valueOf(index)).addConstraintViolation();
 			return this;
 		}
 
@@ -169,5 +168,24 @@ public abstract class AbstractConstraintValidator<A extends Annotation, T> imple
 			addErrors().buildConstraintViolationWithTemplate(String.format(message, messageArgs)).addConstraintViolation();
 			return this;
 		}
+		
+		/**
+		 * Validate and sanitize the error location.
+		 * @param location The location
+		 * @return The sanitized location.
+		 * @throws IllegalArgumentException If the location contains dots or slash
+		 */
+		private String validateLocation(String location) throws IllegalArgumentException {
+			
+			if (location.contains(".")) {
+				throw new IllegalArgumentException("Constraint violation error locations cannot contain dots.");
+			}
+			location = location.replaceFirst("^\\/", "");
+			if (location.contains("/")) {
+				throw new IllegalArgumentException("Constraint violation error locations cannot contain a slash except as the first character.");
+			}
+			return location;
+		}
+		
 	}
 }
