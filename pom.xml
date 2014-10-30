@@ -4,8 +4,8 @@
 
   <groupId>com.forbesdigital.jee</groupId>
   <artifactId>validation</artifactId>
-  <name>FD JEE Validation</name>
-  <version>0.4.1-SNAPSHOT</version>
+  <name>Java EE Validation</name>
+  <version>0.5.0</version>
   <packaging>jar</packaging>
 
   <properties>
@@ -138,9 +138,6 @@
 				<artifactId>rox-junit-maven-plugin</artifactId>
 				<configuration>
 					<fullStackTraces>true</fullStackTraces>
-<!--			<filters>
-						<filter>55b73b7b80bc</filter>
-					</filters> -->
 				</configuration>
 			</plugin>
 		</plugins>
@@ -169,7 +166,7 @@
 
 	<profiles>
 		<profile>
-			<id>lotarisVersion</id>
+			<id>versioning</id>
 
 			<build>
 				<plugins>
@@ -182,55 +179,6 @@
 		</profile>		
 	</profiles>
 
-	<distributionManagement>
-		<repository>
-			<id>LotarisReleases</id>
-			<name>Lotaris Release Repository</name>
-			<url>${settings.lotaris.nexus.lotaris.releases.url}</url>
-		</repository>
-		<snapshotRepository>
-			<id>LotarisSnapshots</id>
-			<name>Lotaris Snapshot Repository</name>
-			<url>${settings.lotaris.nexus.lotaris.snapshots.url}</url>
-		</snapshotRepository>
-	</distributionManagement>
-
-	<repositories>
-		<repository>
-			<id>LotarisReleases</id>
-			<name>Lotaris Releases Repository</name>
-			<url>${settings.lotaris.nexus.releases.url}</url>
-			<releases/>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-		<repository>
-			<id>LotarisSnapshots</id>
-			<name>Lotaris Snapshots Repository</name>
-			<url>${settings.lotaris.nexus.snapshots.url}</url>
-			<releases/>
-			<snapshots>
-				<updatePolicy>never</updatePolicy>
-			</snapshots>
-		</repository>
-	</repositories>
-
-	<pluginRepositories>
-		<pluginRepository>
-			<id>LotarisReleases</id>
-			<name>Lotaris Repository</name>
-			<url>${settings.lotaris.nexus.releases.url}</url>
-			<releases/>
-		</pluginRepository>
-		<pluginRepository>
-			<id>LotarisSnapshots</id>
-			<name>Lotaris Repository</name>
-			<url>${settings.lotaris.nexus.snapshots.url}</url>
-			<snapshots/>
-		</pluginRepository>
-	</pluginRepositories>
-	
   <dependencies>
 		<dependency>
 			<groupId>com.lotaris.rox.client</groupId>
@@ -238,19 +186,6 @@
 			<version>2.0.0</version>
 			<scope>test</scope>
 		</dependency>
-		
-<!--		<dependency>
-			<groupId>org.eclipse.persistence</groupId>
-			<artifactId>javax.persistence</artifactId>
-			<version>2.1.0</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse.persistence</groupId>
-			<artifactId>eclipselink</artifactId>
-			<version>2.5.2-M1</version>
-			<scope>test</scope>
-		</dependency>-->
 		
 		<dependency>
 			<groupId>javax</groupId>
