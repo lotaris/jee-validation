@@ -309,12 +309,6 @@ public class UserTransferObject {
 }
 ```
 
-## Further Reading
-
-On how to implement a Bean Validator and a Modifier, check out the
-[Confluence page][confluence-howto-write].
-
-
 ## Maven Integration
 
 In a standard Maven multi-module project like we have (EAR / EJB / WAR / JAR), you'll need to setup the dependency as
@@ -389,5 +383,4 @@ See [LICENSE.txt](LICENSE.txt) for the full text.
 [IError]: src/main/java/com/forbesdigital/jee/validation/IError.java
 [IPatchObject]: src/main/java/com/forbesdigital/jee/validation/IPatchObject.java
 [AbstractPatchTransferObject]: src/main/java/com/forbesdigital/jee/validation/AbstractPatchTransferObject.java
-[confluence-howto-write]: https://lotaris.atlassian.net/wiki/display/DC/REST+API+Validations
 [exception-mapper]: /projects/LIB/repos/fd-jee-rest/browse/src/main/java/com/forbesdigital/jee/rest/mappers/ApiErrorsExceptionMapper.java
