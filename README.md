@@ -2,16 +2,6 @@
 
 > This library offers components that facilitate validation of arbitrary objects and how they are serialized towards a client. It focuses on the wiring of the proposed patterns and does not contain any concrete validator implementations.
 
-## Building
-
-1. Clone the repository.
-
-2. Run the following command
-
-```bash
-cd <projectFolder>
-mvn clean install
-```
 ## General Approach
 
 There are two fundamentally different ways how to validate an object:
@@ -320,14 +310,11 @@ You can copy/paste the following dependency definition:
 ```xml
 <!-- Validation -->
 <dependency>
-	<groupId>com.forbesdigital.jee</groupId>
+	<groupId>com.lotaris.jee</groupId>
 	<artifactId>jee-validation</artifactId>
-	<version>[[ version ]]</version>
+	<version>0.5.1</version>
 </dependency>
 ```
-
-**Note:** Replace `[[ version ]]` by the correct version you need in your project. At each version update, you can then
-bump the version in here. This avoids tricky issues where different versions are defined for a same dependency.
 
 Secondly, you'll need to put the dependency in your EJB and EJB-Test modules. (`<artifactIdPrefix>/<artifactIdPrefix>-ejb/pom.xml`
 and `<artifactIdPrefix>/<artifactIdPrefix>-ejb-test/pom.xml`). This time, you will add the dependency under
@@ -335,7 +322,7 @@ and `<artifactIdPrefix>/<artifactIdPrefix>-ejb-test/pom.xml`). This time, you wi
 
 ```xml
 <dependency>
-	<groupId>com.forbesdigital.jee</groupId>
+	<groupId>com.lotaris.jee</groupId>
 	<artifactId>jee-validation</artifactId>
 	<scope>provided</scope>
 </dependency>
@@ -350,7 +337,7 @@ and `<artifactIdPrefix>/<artifactIdPrefix>-war-test/pom.xml`). Again, dependency
 
 ```xml
 <dependency>
-	<groupId>com.forbesdigital.jee</groupId>
+	<groupId>com.lotaris.jee</groupId>
 	<artifactId>jee-validation</artifactId>
 </dependency>
 ```
@@ -374,13 +361,13 @@ See [LICENSE.txt](LICENSE.txt) for the full text.
 
 [bean-validations]: http://en.wikipedia.org/wiki/Bean_Validation
 [built-in]: http://docs.oracle.com/javaee/6/api/javax/validation/constraints/package-summary.html
-[IValidator]: src/main/java/com/forbesdigital/jee/validation/IValidator.java
-[IValidationContext]: src/main/java/com/forbesdigital/jee/validation/IValidationContext.java
-[preprocessing]: src/main/java/com/forbesdigital/jee/validation/preprocessing
-[PreprocessingChain]: src/main/java/com/forbesdigital/jee/validation/preprocessing/PreprocessingChain.java
-[AbstractValidator]: src/main/java/com/forbesdigital/jee/validation/AbstractValidator.java
-[RestResource]: /projects/LIB/repos/fd-jee-rest/browse/src/main/java/com/forbesdigital/jee/rest/AbstractResource.java
-[IError]: src/main/java/com/forbesdigital/jee/validation/IError.java
-[IPatchObject]: src/main/java/com/forbesdigital/jee/validation/IPatchObject.java
-[AbstractPatchTransferObject]: src/main/java/com/forbesdigital/jee/validation/AbstractPatchTransferObject.java
-[exception-mapper]: /projects/LIB/repos/fd-jee-rest/browse/src/main/java/com/forbesdigital/jee/rest/mappers/ApiErrorsExceptionMapper.java
+[IValidator]: src/main/java/com/lotaris/jee/validation/IValidator.java
+[IValidationContext]: src/main/java/com/lotaris/jee/validation/IValidationContext.java
+[preprocessing]: src/main/java/com/lotaris/jee/validation/preprocessing
+[PreprocessingChain]: src/main/java/com/lotaris/jee/validation/preprocessing/PreprocessingChain.java
+[AbstractValidator]: src/main/java/com/lotaris/jee/validation/AbstractValidator.java
+[RestResource]: /projects/LIB/repos/jee-rest/browse/src/main/java/com/lotaris/jee/rest/AbstractResource.java
+[IError]: src/main/java/com/lotaris/jee/validation/IError.java
+[IPatchObject]: src/main/java/com/lotaris/jee/validation/IPatchObject.java
+[AbstractPatchTransferObject]: src/main/java/com/lotaris/jee/validation/AbstractPatchTransferObject.java
+[exception-mapper]: /projects/LIB/repos/jee-rest/browse/src/main/java/com/lotaris/jee/rest/mappers/ApiErrorsExceptionMapper.java

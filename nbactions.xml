@@ -6,7 +6,6 @@
 		<goals>
 			<goal>clean</goal>
 			<goal>install</goal>
-			<goal>rox-junit:junit</goal>
 			<goal>-e</goal>
 		</goals>
 	</action>
