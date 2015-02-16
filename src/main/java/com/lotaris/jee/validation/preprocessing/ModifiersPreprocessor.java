@@ -124,6 +124,11 @@ public class ModifiersPreprocessor implements IPreprocessor {
 
 	@Override
 	public boolean process(Object object, IPreprocessingConfig config) {
+		
+		// Nothing to modify
+		if (object == null) {
+			return true;
+		}
 
 		fillCache(object.getClass(), processorsCache);
 

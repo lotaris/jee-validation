@@ -1,6 +1,7 @@
 package com.lotaris.jee.validation.preprocessing;
 
 import com.lotaris.jee.validation.AbstractPatchTransferObject;
+import com.lotaris.jee.validation.ApiErrorResponse;
 import com.lotaris.jee.validation.IConstraintConverter;
 import com.lotaris.jee.validation.IErrorCode;
 import com.lotaris.jee.validation.IErrorLocationType;
@@ -79,6 +80,11 @@ public class BeanValidationPreprocessor implements IPreprocessor {
 			}
 
 			patch = (IPatchObject) object;
+		}
+		
+		// Cannot validate null object
+		if (object == null) {
+			return true;
 		}
 
 		// Validate the object. This may be a wrapped object (see JsonRootWrapper).
