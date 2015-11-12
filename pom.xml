@@ -6,7 +6,7 @@
 
   <groupId>com.lotaris.jee</groupId>
   <artifactId>jee-validation</artifactId>
-  <version>0.5.2</version>
+  <version>0.6.0</version>
   <packaging>jar</packaging>
 
 	<name>Java EE Validation</name>
