@@ -1,7 +1,7 @@
 package com.lotaris.jee.validation;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.annotate.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Detailed error message concerning a JSON document submitted by an API client.
