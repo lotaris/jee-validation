@@ -1,11 +1,11 @@
 package com.lotaris.jee.validation;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.codehaus.jackson.annotate.JsonIgnore;
 
 /**
  * An API response indicating that one or multiple errors prevented the request from being
