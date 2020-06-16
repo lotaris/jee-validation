@@ -1,3 +1,7 @@
+### :warning: Unmaintained.
+
+---
+
 # jee-validation
 
 > This library offers components that facilitate validation of arbitrary objects and how they are serialized towards a client. It focuses on the wiring of the proposed patterns and does not contain any concrete validator implementations.
